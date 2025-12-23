@@ -1,0 +1,201 @@
+
+import React from 'react';
+import { Course, Question, User, ProjectIdea, Report, WeeklyChallenge, Roadmap } from './types';
+
+export const TRANSLATIONS = {
+  en: {
+    title: "CyberHub",
+    subtitle: "Engineering Your Future",
+    academicExcellence: "Academic Excellence in Engineering",
+    home: "Home",
+    community: "Forum",
+    library: "Library",
+    coordination: "Projects",
+    aiAssistant: "Ask Cyber",
+    profile: "Profile",
+    askCyber: "Ask Cyber Engine",
+    heroTitle: "Master Your",
+    heroAccent: "Academic Journey",
+    heroDesc: "The ultimate academic portal for Engineering students. A unified archive for official coursework, practical labs, and expert certifications.",
+    browseLibrary: "Explore Library",
+    joinCommunity: "Join Community",
+    searchPlaceholder: "Search courses, labs, or certifications...",
+    roadmapsTitle: "Engineering Roadmaps",
+    roadmapsDesc: "Structured learning paths curated by faculty and experts.",
+    stepsCompleted: "Steps Completed",
+    officialArchive: "Official Archive",
+    practicalLibrary: "Practical Library",
+    pendingReview: "Pending Review",
+    uploadResource: "Add Resource",
+    backToLibrary: "Back to Library",
+    tools: "Security Tools",
+    certs: "Certifications",
+    ctf: "CTF Writeups",
+    projectCenter: "Project Center",
+    eventsHub: "Events Hub",
+    proposeIdea: "Propose Project",
+    teamSlots: "Slots",
+    joinTeam: "Join Team",
+    leaveTeam: "Leave Team",
+    editProfile: "Settings",
+    saveChanges: "Save Changes",
+    exportPortfolio: "Export CV",
+    mySkills: "Certified Skills",
+    myActivity: "Academic Log",
+    myBadges: "Credentials",
+    weeklyChallenge: "Weekly Challenge",
+    submitSolution: "Submit Solution",
+    bugReport: "Report Bug",
+    radarNetwork: "Network",
+    radarCrypto: "Crypto",
+    radarProgramming: "Code",
+    radarAI: "AI",
+    radarAppSec: "AppSec",
+    skillRadarTitle: "Competency Radar",
+    resourceType: "Type",
+    resourceTitle: "Title",
+    resourceUrl: "URL",
+    resourceDesc: "Description",
+    cancel: "Cancel",
+    submit: "Submit",
+    official: "Official",
+    practical: "Practical",
+    role: "Role",
+    major: "Major",
+    name: "Name",
+    postedBy: "Posted by",
+    askQuestion: "Start Topic",
+    newQuestion: "New Topic",
+    reportReason: "Reason",
+    submitReport: "Submit Report",
+    reportContent: "Report",
+    activityLog: "Activity Log",
+    heatmapTitle: "Popular Subjects",
+    facultyEngagement: "Faculty Activity",
+    reportsQueue: "Reports",
+    exportSuccess: "Portfolio exported!",
+    upcomingEvents: "Upcoming Events",
+    summaries: "Summaries",
+    videos: "Videos",
+    explanations: "Explanations",
+    auditMode: "Audit Mode",
+    generalChat: "Chat",
+    placeholderAI: "Ask 'Ask Cyber'...",
+    placeholderAudit: "Paste code...",
+    authority: "Authority",
+    faculty: "Faculty",
+    leaderboard: "Top Contributors",
+    answered: "Answered",
+    unanswered: "Unanswered",
+    featureQuestion: "Feature",
+    unfeatureQuestion: "Unfeature",
+    moderatorRoom: "Live Meeting Room",
+    challengeClosed: "Challenge Expired",
+    joinMeeting: "Join Meeting",
+    startMeeting: "Start Meeting",
+    approve: "Approve",
+    reject: "Reject",
+    featuredOnly: "Showing Featured Experts Discussions",
+    waitingModerator: "Request Sent. Waiting for Moderator...",
+    meetingDenied: "Moderator denied your entry.",
+    participants: "Participants",
+    waitingRoom: "Waiting Room",
+    acceptEntry: "Accept",
+    denyEntry: "Deny",
+    achievementsHall: "Achievements Hall of Fame",
+    expertReply: "Expert Reply",
+    showMore: "Show More",
+  }
+};
+
+// ABSOLUTE START: New Student with 0 Stats
+export const CURRENT_USER: User = {
+  id: 'u-zero',
+  // Fix: Added required 'email' property to CURRENT_USER
+  email: 'candidate@smail.ucas.edu.ps',
+  name: 'Candidate Engineer',
+  role: 'Student',
+  avatar: 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=300&h=300&fit=crop',
+  karma: 0,
+  major: 'B.Sc. Engineering Candidate',
+  stats: { questionsAsked: 0, answersGiven: 0, verificationsReceived: 0, karma: 0 },
+  skillScores: { network: 0, crypto: 0, programming: 0, ai: 0, appSec: 0 },
+  completedRoadmapSteps: [],
+  joinedProjects: [],
+  skills: [],
+  badges: [],
+  activity: []
+};
+
+export const MOCK_STUDENTS: User[] = [
+  // Fix: Added required 'email' property to MOCK_STUDENTS items
+  { id: 's3', email: 'faisal@smail.ucas.edu.ps', name: 'Dr. Faisal', role: 'Faculty', avatar: 'https://i.pravatar.cc/150?u=s3', karma: 4500, major: 'Cyber Theory', stats: { questionsAsked: 2, answersGiven: 89, verificationsReceived: 120, karma: 4500 } },
+  { id: 's2', email: 'mona@smail.ucas.edu.ps', name: 'Mona Ibrahim', role: 'Expert', avatar: 'https://i.pravatar.cc/150?u=s2', karma: 1250, major: 'AI Engineering' },
+  { id: 's1', email: 'zaid@smail.ucas.edu.ps', name: 'Zaid Al-Harbi', role: 'Expert', avatar: 'https://i.pravatar.cc/150?u=s1', karma: 890, major: 'Cybersecurity' },
+  { id: 's4', email: 'khalid@smail.ucas.edu.ps', name: 'Khalid Othman', role: 'Student', avatar: 'https://i.pravatar.cc/150?u=s4', karma: 150, major: 'CS Engineering' },
+];
+
+export const MOCK_CHALLENGE: WeeklyChallenge = {
+  id: 'c-1',
+  title: "Buffer Overflow Lab",
+  description: "Identify the vulnerable function in the provided C snippet. Experts will guide the live session.",
+  difficulty: "Hard",
+  rewardBadge: "Buffer Buster",
+  expiresAt: new Date(Date.now() + 86400000 * 3),
+  winners: [],
+  meetingActive: true,
+  meetingModeratorId: 's3',
+  joinRequests: []
+};
+
+export const MOCK_COURSES: Course[] = [
+  { id: 'c1', title: 'Advanced Network Defense', category: 'Cybersecurity', description: 'Securing complex infrastructures.', instructor: 'Dr. Sarah', image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc51?w=600&q=80', rating: 4.9, students: 1200, year: 3, semester: 1, resources: [] },
+  { id: 'c2', title: 'Neural Networks & Deep Learning', category: 'AI', description: 'Building advanced cognitive models.', instructor: 'Dr. Faisal', image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&q=80', rating: 4.8, students: 950, year: 2, semester: 2, resources: [] },
+  { id: 'c3', title: 'Cryptography Theory', category: 'Engineering', description: 'Mathematical foundations of security.', instructor: 'Dr. Faisal', image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&q=80', rating: 4.9, students: 800, year: 4, semester: 1, resources: [] }
+];
+
+export const MOCK_QUESTIONS: Question[] = [
+  {
+    id: `qa-1`, authorId: 's4', authorName: 'Khalid', title: `JWT Verification Logic`, text: 'How do I securely handle JWT expiration in a distributed system?',
+    category: 'Cyber', timestamp: new Date(Date.now() - 3600000), answers: [
+      { id: `an-1`, authorId: 's3', authorName: 'Dr. Faisal', authorRole: 'Faculty', text: 'Use refresh tokens and short-lived access tokens with a centralized revocation list.', timestamp: new Date(), isVerified: true, upvotes: 12 }
+    ],
+    isExpertRequired: true, isFeatured: true, status: 'Answered'
+  },
+  {
+    id: `qu-1`, authorId: 's4', authorName: 'Khalid', title: `Adversarial Attacks on CNN`, text: 'Stuck on implementing FGSM attack for my AI lab. Any advice?',
+    category: 'AI', timestamp: new Date(), answers: [], isExpertRequired: true, isFeatured: false, status: 'Unanswered'
+  }
+];
+
+export const MOCK_PROJECTS: ProjectIdea[] = [
+  { id: 'p1', title: 'Malware Sandbox V2', proposerName: 'Dr. Faisal', proposerId: 's3', proposerRole: 'Faculty', description: 'Automated analysis pipeline for binaries.', requiredSkills: ['C++', 'Python'], slots: 5, filledSlots: 0, category: 'Research', status: 'Open' },
+  { id: 'p2', title: 'LLM Security Audit', proposerName: 'Mona', proposerId: 's2', proposerRole: 'Expert', description: 'Probing models for prompt injection vulnerabilities.', requiredSkills: ['LLM', 'Python'], slots: 3, filledSlots: 0, category: 'Side Project', status: 'Open' }
+];
+
+export const MOCK_ROADMAPS: Roadmap[] = [
+  { id: 'rm-1', title: 'Security Researcher', description: 'Deep dive into vulnerability research.', category: 'Cybersecurity', icon: '🛡️', steps: [{ id: 'rs-1', label: 'Linux Core', type: 'Skill', description: 'Kernel basics.' }, { id: 'rs-2', label: 'Assembly x86', type: 'Skill', description: 'Basics of reverse engineering.' }] }
+];
+
+export const MOCK_REPORTS: Report[] = [];
+
+export const Icons = {
+  Home: ({ className }: { className?: string }) => <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className={className || "w-6 h-6"}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>,
+  Community: ({ className }: { className?: string }) => <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className={className || "w-6 h-6"}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>,
+  Library: ({ className }: { className?: string }) => <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className={className || "w-6 h-6"}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>,
+  Coordination: ({ className }: { className?: string }) => <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className={className || "w-6 h-6"}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>,
+  Profile: ({ className }: { className?: string }) => <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className={className || "w-6 h-6"}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>,
+  AI: ({ className }: { className?: string }) => <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className={className || "w-6 h-6"}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>,
+  Robot: ({ className }: { className?: string }) => <svg viewBox="0 0 24 24" className={className} fill="none"><path d="M12 2L12 4M12 20V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><path d="M7 6H17C18.1046 6 19 6.89543 19 8V16C19 17.1046 18.1046 18 17 18H7C5.89543 18 5 17.1046 5 16V8C5 6.89543 5.89543 6 7 6Z" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="2"/><circle cx="9" cy="11" r="1.5" fill="currentColor"/><circle cx="15" cy="11" r="1.5" fill="currentColor"/><path d="M10 14.5C10 14.5 11 15.5 12 15.5C13 15.5 14 14.5 14 14.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><path d="M4 12H2M22 12H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><path d="M8 6V4C8 3.44772 8.44772 3 9 3H15C15.5523 3 16 3.44772 16 4V6" stroke="currentColor" strokeWidth="1.5"/></svg>,
+  Shield: ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" className={className || "w-5 h-5"} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-9.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>,
+  Trophy: ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" className={className || "w-5 h-5"} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>,
+  Star: ({ className }: { className?: string }) => <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className={className || "w-6 h-6"}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.382-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>,
+  Check: ({ className }: { className?: string }) => <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className={className || "w-4 h-4"}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>,
+  ChevronRight: ({ className }: { className?: string }) => <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className={className || "w-4 h-4"}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>,
+  Video: ({ className }: { className?: string }) => <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className={className || "w-5 h-5"}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2-2v8a2 2 0 002 2z" /></svg>,
+  Folder: ({ className }: { className?: string }) => <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className={className || "w-5 h-5"}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>,
+  Globe: ({ className }: { className?: string }) => <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className={className || "w-5 h-5"}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>,
+  Sun: ({ className }: { className?: string }) => <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className={className || "w-5 h-5"}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" /></svg>,
+  Moon: ({ className }: { className?: string }) => <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className={className || "w-5 h-5"}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>,
+  Flag: ({ className }: { className?: string }) => <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className={className || "w-5 h-5"}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" /></svg>,
+};

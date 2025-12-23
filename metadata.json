@@ -1,0 +1,7 @@
+{
+  "name": "Copy of CyberHub - Cybersecurity & AI Academic Portal",
+  "description": "A high-end academic platform designed for Cybersecurity and AI Engineering students, featuring course libraries, resource centers, and an AI-powered study assistant.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
