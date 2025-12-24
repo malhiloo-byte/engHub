@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberHub | Engineering Your Future</title>
+    <title>CyberHub | Engineering Excellence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -14,101 +14,32 @@
                     fontFamily: {
                         orbitron: ['Orbitron', 'sans-serif'],
                         inter: ['Inter', 'sans-serif'],
-                    },
-                    fontSize: {
-                        'xs': '0.8rem',
-                        'sm': '0.95rem',
-                        'base': '1.05rem',
-                        'lg': '1.2rem',
+                        cairo: ['Cairo', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;700&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', 'Cairo', sans-serif;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            font-size: 1.05rem;
-            margin: 0;
-            padding: 0;
-        }
-        [dir="rtl"] body {
-            font-family: 'Cairo', sans-serif;
-        }
-        .glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .dark .glass {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .light .glass {
-            background: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-        }
-        .cyber-gradient {
-            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-        }
-        .cyber-text-gradient {
-            background: linear-gradient(to right, #22d3ee, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-        .dark ::-webkit-scrollbar-thumb {
-            background: #1e293b;
-        }
-        /* Loading Splash Styles */
-        #splash {
-            position: fixed;
-            inset: 0;
-            background: #020617;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
-        }
-        .loader {
-            width: 48px;
-            height: 48px;
-            border: 5px solid #FFF;
-            border-bottom-color: #06b6d4;
-            border-radius: 50%;
-            display: inline-block;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
-        }
-        @keyframes rotation {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        body { font-family: 'Inter', 'Cairo', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .cyber-gradient { background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%); }
+        .cyber-text-gradient { background: linear-gradient(to right, #22d3ee, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        #splash { position: fixed; inset: 0; background: #020617; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+        .loader { width: 48px; height: 48px; border: 5px solid #FFF; border-bottom-color: #06b6d4; border-radius: 50%; animation: rotation 1s linear infinite; }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
-<script type="importmap">
+    <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/",
+    "react-dom": "https://esm.sh/react-dom@^19.2.3",
+    "react-dom/client": "https://esm.sh/react-dom@^19.2.3/client",
     "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
-    "jspdf": "https://esm.sh/jspdf@^2.5.1"
+    "jspdf": "https://esm.sh/jspdf@^2.5.1",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
   }
 }
 </script>
@@ -116,20 +47,16 @@
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50">
     <div id="splash">
         <div class="loader mb-4"></div>
-        <p style="color: #06b6d4; font-family: 'Orbitron', sans-serif; font-size: 12px; letter-spacing: 4px;">CYBERHUB BOOTING...</p>
+        <p class="font-orbitron text-cyan-500 text-[10px] tracking-[4px] animate-pulse">INITIATING CYBERHUB...</p>
     </div>
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
     <script>
-        // Remove splash once React is loaded
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const splash = document.getElementById('splash');
-                if (splash) {
-                    splash.style.opacity = '0';
-                    setTimeout(() => splash.remove(), 500);
-                }
-            }, 1000);
+                if (splash) splash.style.display = 'none';
+            }, 800);
         });
     </script>
 </body>

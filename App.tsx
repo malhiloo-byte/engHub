@@ -56,9 +56,7 @@ const App: React.FC = () => {
   const addToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     const id = Date.now().toString();
     setToasts(prev => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
-    }, 4000);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
   };
 
   const handleLogin = (user: User) => {
@@ -78,12 +76,7 @@ const App: React.FC = () => {
     const updatedUsers = allUsers.map(u => u.id === userId ? { ...u, role: newRole } : u);
     setAllUsers(updatedUsers);
     addToast(lang === 'ar' ? 'تم تحديث صلاحيات المستخدم' : 'User permissions updated', 'info');
-    
-    if (currentUser?.id === userId) {
-      handleLogout();
-    } else if (viewingUser?.id === userId) {
-      setViewingUser(prev => prev ? { ...prev, role: newRole } : null);
-    }
+    if (viewingUser?.id === userId) setViewingUser(prev => prev ? { ...prev, role: newRole } : null);
   };
 
   const handleLogout = () => {
@@ -114,9 +107,7 @@ const App: React.FC = () => {
     const isJoined = currentUser.joinedProjects?.includes(projectId);
     const updated = {
       ...currentUser,
-      joinedProjects: isJoined
-        ? currentUser.joinedProjects?.filter(id => id !== projectId)
-        : [...(currentUser.joinedProjects || []), projectId],
+      joinedProjects: isJoined ? currentUser.joinedProjects?.filter(id => id !== projectId) : [...(currentUser.joinedProjects || []), projectId],
     };
     setCurrentUser(updated);
     setAllUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
@@ -151,12 +142,9 @@ const App: React.FC = () => {
     if (!currentUser) return;
     setChallenge(prev => ({
       ...prev,
-      joinRequests: [
-        ...prev.joinRequests.filter(r => r.userId !== currentUser.id),
-        { userId: currentUser.id, userName: currentUser.name, status: 'Pending' }
-      ]
+      joinRequests: [...prev.joinRequests.filter(r => r.userId !== currentUser.id), { userId: currentUser.id, userName: currentUser.name, status: 'Pending' }]
     }));
-    addToast(lang === 'ar' ? 'تم إرسال طلب الانضمام' : 'Join request sent', 'info');
+    addToast(lang === 'ar' ? 'طلب الانضمام قيد المراجعة' : 'Join request pending approval', 'info');
   };
 
   const handleMeetingPermission = (userId: string, action: 'Accept' | 'Reject') => {
@@ -181,7 +169,6 @@ const App: React.FC = () => {
       authorId: currentUser.id,
       timestamp: new Date(),
     };
-
     setCourses(prev => prev.map(c => c.id === courseId ? { ...c, resources: [...c.resources, newRes] } : c));
     addToast(newRes.status === 'Approved' ? 'Resource added' : 'Resource submitted for review', 'success');
   };
@@ -203,9 +190,7 @@ const App: React.FC = () => {
     }
   };
 
-  const handleBroadcast = (msg: string) => {
-    addToast(msg, 'info');
-  };
+  const handleBroadcast = (msg: string) => addToast(msg, 'info');
 
   if (!isLoggedIn || !currentUser) {
     return (
@@ -232,7 +217,7 @@ const App: React.FC = () => {
       <main className="max-w-7xl mx-auto px-8 py-10">
         <header className="flex justify-between items-center mb-12">
           <div className="flex items-center space-x-4 space-x-reverse">
-            <h1 className="text-2xl font-orbitron font-bold cyber-text-gradient">{t.title}</h1>
+            <h1 className="text-2xl font-orbitron font-bold cyber-text-gradient cursor-pointer" onClick={() => setActiveTab('home')}>{t.title}</h1>
             <span className="h-6 w-[1px] bg-slate-200 dark:bg-white/10" />
             <p className="text-slate-500 text-sm font-medium">{t.academicExcellence}</p>
           </div>
@@ -273,18 +258,18 @@ const App: React.FC = () => {
                 <aside className="space-y-8">
                   <h3 className="text-2xl font-bold font-orbitron flex items-center gap-4 text-red-500">
                     <Icons.Shield className="w-6 h-6" />
-                    Threat Feed
+                    Cyber Threat Feed
                   </h3>
                   <div className="glass p-8 rounded-[3rem] border-red-500/10 space-y-6">
                      <div className="p-4 bg-red-500/5 rounded-2xl border border-red-500/10">
-                        <p className="text-[10px] font-black text-red-500 uppercase mb-1">CVE-2024-XXXX</p>
-                        <p className="text-xs font-bold">New RCE found in popular AI framework.</p>
+                        <p className="text-[10px] font-black text-red-500 uppercase mb-1">CVE-2024-4321</p>
+                        <p className="text-xs font-bold">RCE detected in common SSH libraries.</p>
                      </div>
                      <div className="p-4 bg-blue-500/5 rounded-2xl border border-blue-500/10">
                         <p className="text-[10px] font-black text-blue-500 uppercase mb-1">AI NEWS</p>
-                        <p className="text-xs font-bold">Gemini 3.0 Pro preview released for developers.</p>
+                        <p className="text-xs font-bold">New paper on Adversarial Attacks in LLMs.</p>
                      </div>
-                     <button onClick={() => setActiveTab('ai')} className="w-full text-center py-3 text-[10px] font-black text-slate-500 hover:text-cyan-500 transition-colors uppercase">View Global Feed</button>
+                     <button onClick={() => setActiveTab('ai')} className="w-full text-center py-3 text-[10px] font-black text-slate-500 hover:text-cyan-500 transition-colors uppercase">View Security Bulletin</button>
                   </div>
                 </aside>
              </div>
@@ -358,6 +343,7 @@ const App: React.FC = () => {
         )}
       </main>
 
+      {/* Persistent AI Chat Toggle */}
       <div className={`fixed bottom-10 ${lang === 'ar' ? 'left-10' : 'right-10'} flex flex-col items-end space-y-4 z-50`}>
         <button onClick={handleLogout} className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-lg">
            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>

@@ -35,7 +35,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, theme, setTh
         <div className="w-12 h-12 cyber-gradient rounded-2xl flex items-center justify-center shadow-lg shadow-cyan-500/20 transition-all duration-500 group-hover:rotate-[360deg] group-hover:scale-110 group-hover:shadow-cyan-500/50 group-hover:rounded-[50%]">
           <span className="font-orbitron font-bold text-white text-2xl group-hover:scale-125 transition-transform">C</span>
         </div>
-        <div className="absolute inset-0 w-12 h-12 bg-cyan-400 rounded-2xl blur-xl opacity-0 group-hover:opacity-40 transition-opacity animate-pulse pointer-events-none" />
       </div>
 
       <nav className="flex flex-col space-y-4 flex-1">
@@ -50,7 +49,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, theme, setTh
             }`}
           >
             {item.icon}
-            <span className={`absolute ${lang === 'ar' ? 'right-full mr-4' : 'left-full ml-4'} px-2 py-1 bg-slate-900 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10`}>
+            <span className={`absolute ${lang === 'ar' ? 'right-full mr-4' : 'left-full ml-4'} px-2 py-1 bg-slate-900 text-[10px] font-black uppercase text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10`}>
               {item.label}
             </span>
           </button>
@@ -58,19 +57,11 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, theme, setTh
       </nav>
 
       <div className="mt-auto flex flex-col items-center space-y-4">
-        <button 
-          onClick={toggleLang}
-          className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-white/5 group relative"
-        >
+        <button onClick={toggleLang} className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-white/5 group relative">
           <Icons.Globe />
-          <span className={`absolute ${lang === 'ar' ? 'right-full mr-4' : 'left-full ml-4'} px-2 py-1 bg-slate-900 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10`}>
-            {t.langToggle}
-          </span>
+          <span className={`absolute ${lang === 'ar' ? 'right-full mr-4' : 'left-full ml-4'} px-2 py-1 bg-slate-900 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10`}>{t.langToggle}</span>
         </button>
-        <button 
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-white/5"
-        >
+        <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-white/5">
           {theme === 'dark' ? <Icons.Sun /> : <Icons.Moon />}
         </button>
       </div>
