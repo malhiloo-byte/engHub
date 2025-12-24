@@ -67,8 +67,8 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
         <div className={`cyber-gradient p-12 rounded-[3.5rem] text-white shadow-2xl relative overflow-hidden group transition-all ${isClosed ? 'grayscale opacity-70' : ''}`}>
            <div className="absolute -right-20 -bottom-20 opacity-10 transition-transform group-hover:scale-125 duration-1000 rotate-12"><Icons.Robot className="w-96 h-96" /></div>
            <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-10">
-              <div className="max-w-2xl space-y-4">
-                 <div className="flex items-center space-x-3 mb-2">
+              <div className="max-w-2xl space-y-4 text-start">
+                 <div className="flex items-center space-x-3 space-x-reverse mb-2">
                    <span className="bg-white/20 backdrop-blur-md px-5 py-1.5 rounded-full text-[11px] font-black uppercase tracking-[0.3em] border border-white/20">{t.weeklyChallenge}</span>
                    <span className="text-[11px] font-black uppercase tracking-widest text-white/60">Live Interactive Lab</span>
                  </div>
@@ -79,9 +79,9 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
                  <button 
                   onClick={() => (myJoinRequest?.status === 'Accepted' || canModerate) ? setShowMeeting(true) : onJoinMeeting()}
                   className="bg-white text-blue-600 px-12 py-5 rounded-[2.5rem] font-black text-xs uppercase tracking-[0.2em] shadow-2xl hover:scale-105 active:scale-95 transition-all">
-                    {canModerate ? t.startMeeting : (myJoinRequest?.status === 'Pending' ? 'Request Sent...' : t.joinMeeting)}
+                    {canModerate ? t.startMeeting : (myJoinRequest?.status === 'Pending' ? t.waitingModerator : (myJoinRequest?.status === 'Accepted' ? t.joinMeeting : t.joinMeeting))}
                  </button>
-                 {myJoinRequest?.status === 'Rejected' && <span className="text-xs text-red-200 font-bold bg-red-500/20 px-4 py-1 rounded-full border border-red-500/30">Entry Denied by Moderator</span>}
+                 {myJoinRequest?.status === 'Rejected' && <span className="text-xs text-red-200 font-bold bg-red-500/20 px-4 py-1 rounded-full border border-red-500/30">{t.meetingDenied}</span>}
               </div>
            </div>
         </div>
@@ -97,11 +97,11 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
                          <div className="w-32 h-32 rounded-full bg-cyan-500/10 flex items-center justify-center border-2 border-cyan-500/30 mx-auto">
                             <Icons.Robot className="w-16 h-16 text-cyan-500" />
                          </div>
-                         <p className="font-orbitron font-bold text-slate-500 uppercase tracking-[0.5em]">Establishing Encrypted Stream...</p>
+                         <p className="font-orbitron font-bold text-slate-500 uppercase tracking-[0.5em]">{t.waitingModerator}</p>
                       </div>
                    </div>
                    {/* Overlay Tags */}
-                   <div className="absolute top-10 left-10 flex gap-4">
+                   <div className="absolute top-10 right-10 flex gap-4">
                       <span className="px-5 py-2 bg-red-500 text-white rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                         <div className="w-2 h-2 bg-white rounded-full animate-ping" /> Live Session
                       </span>
@@ -111,8 +111,12 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
                    </div>
                    {/* Bottom Controls */}
                    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-6 bg-slate-900/80 backdrop-blur-3xl px-10 py-5 rounded-[2.5rem] border border-white/10 shadow-2xl">
-                      <button onClick={() => setIsMuted(!isMuted)} className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${isMuted ? 'bg-red-500/20 text-red-500 border-red-500/20' : 'bg-white/5 text-white'}`}><Icons.Check className="w-6 h-6" /></button>
-                      <button onClick={() => setIsCamOff(!isCamOff)} className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${isCamOff ? 'bg-red-500/20 text-red-500 border-red-500/20' : 'bg-white/5 text-white'}`}><Icons.Video className="w-6 h-6" /></button>
+                      <button onClick={() => setIsMuted(!isMuted)} className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${isMuted ? 'bg-red-500/20 text-red-500 border-red-500/20' : 'bg-white/5 text-white'}`}>
+                        {isMuted ? <Icons.MicOff className="w-6 h-6" /> : <Icons.Mic className="w-6 h-6" />}
+                      </button>
+                      <button onClick={() => setIsCamOff(!isCamOff)} className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${isCamOff ? 'bg-red-500/20 text-red-500 border-red-500/20' : 'bg-white/5 text-white'}`}>
+                        {isCamOff ? <Icons.VideoOff className="w-6 h-6" /> : <Icons.Video className="w-6 h-6" />}
+                      </button>
                       <div className="w-[1px] h-10 bg-white/10 mx-2" />
                       <button onClick={() => setShowMeeting(false)} className="px-10 py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl">End Session</button>
                    </div>
@@ -121,8 +125,8 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
 
              {/* Sidebar (Participants & Waiting Room) */}
              <div className="w-full md:w-[24rem] glass rounded-[3.5rem] border-white/10 p-10 flex flex-col gap-10">
-                <div className="space-y-2">
-                   <h3 className="text-xl font-bold font-orbitron uppercase tracking-tighter">Participants</h3>
+                <div className="space-y-2 text-start">
+                   <h3 className="text-xl font-bold font-orbitron uppercase tracking-tighter">{t.participants}</h3>
                    <p className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.3em]">Authorized Members Only</p>
                 </div>
                 
@@ -131,15 +135,15 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-cyan-500/20 shadow-lg">
                       <div className="flex items-center gap-4">
                          <img src="https://i.pravatar.cc/150?u=s3" className="w-10 h-10 rounded-xl object-cover border border-cyan-500/30" />
-                         <div><p className="text-xs font-bold">Dr. Faisal</p><p className="text-[8px] font-black text-cyan-500 uppercase">Moderator</p></div>
+                         <div className="text-start"><p className="text-xs font-bold">Dr. Faisal</p><p className="text-[8px] font-black text-cyan-500 uppercase">Moderator</p></div>
                       </div>
                       <Icons.Shield className="w-4 h-4 text-cyan-500" />
                    </div>
 
                    {/* Waiting Room (For Faculty Only) */}
                    {canModerate && challenge.joinRequests.filter(r => r.status === 'Pending').length > 0 && (
-                     <div className="space-y-4 pt-6 border-t border-white/5">
-                        <p className="text-[9px] font-black text-yellow-500 uppercase tracking-widest">Waiting Room ({challenge.joinRequests.filter(r => r.status === 'Pending').length})</p>
+                     <div className="space-y-4 pt-6 border-t border-white/5 text-start">
+                        <p className="text-[9px] font-black text-yellow-500 uppercase tracking-widest">{t.waitingRoom} ({challenge.joinRequests.filter(r => r.status === 'Pending').length})</p>
                         {challenge.joinRequests.filter(r => r.status === 'Pending').map(req => (
                           <div key={req.userId} className="p-5 bg-yellow-500/5 rounded-2xl border border-yellow-500/20 flex flex-col gap-4 animate-in slide-in-from-right-4">
                              <div className="flex items-center gap-3">
@@ -147,8 +151,8 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
                                 <span className="text-xs font-bold">{req.userName}</span>
                              </div>
                              <div className="flex gap-2">
-                                <button onClick={() => onMeetingPermission(req.userId, 'Accept')} className="flex-1 py-2 bg-emerald-500 text-white rounded-xl text-[8px] font-black uppercase">Approve</button>
-                                <button onClick={() => onMeetingPermission(req.userId, 'Reject')} className="flex-1 py-2 bg-red-500/20 text-red-500 rounded-xl text-[8px] font-black uppercase">Deny</button>
+                                <button onClick={() => onMeetingPermission(req.userId, 'Accept')} className="flex-1 py-2 bg-emerald-500 text-white rounded-xl text-[8px] font-black uppercase">{t.acceptEntry}</button>
+                                <button onClick={() => onMeetingPermission(req.userId, 'Reject')} className="flex-1 py-2 bg-red-500/20 text-red-500 rounded-xl text-[8px] font-black uppercase">{t.denyEntry}</button>
                              </div>
                           </div>
                         ))}
@@ -156,7 +160,7 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
                    )}
 
                    {/* Accepted Members */}
-                   <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest pt-6 border-t border-white/5">Active in Call</p>
+                   <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest pt-6 border-t border-white/5 text-start">Active in Call</p>
                    {challenge.joinRequests.filter(r => r.status === 'Accepted').map(req => (
                      <div key={req.userId} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
                         <div className="flex items-center gap-4">
@@ -215,18 +219,18 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
       {/* Leaderboard Sidebar */}
       <div className="lg:col-span-1">
         <div className="glass p-10 rounded-[3.5rem] border-white/5 sticky top-8 shadow-2xl">
-          <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-cyan-500 mb-10 border-b border-white/5 pb-5">Academic Vanguard</h3>
+          <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-cyan-500 mb-10 border-b border-white/5 pb-5">{t.leaderboard}</h3>
           <div className="space-y-8">
             {MOCK_STUDENTS.map((student) => (
               <div key={student.id} className="flex items-center justify-between group cursor-pointer" onClick={() => onViewUser(student.id)}>
-                <div className="flex items-center space-x-5">
+                <div className="flex items-center space-x-5 space-x-reverse">
                   <div className="relative">
                     <img src={student.avatar} className="w-14 h-14 rounded-2xl object-cover border border-white/10 transition-transform group-hover:scale-110 shadow-lg" />
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-slate-900 flex items-center justify-center"><Icons.Check className="w-3 h-3 text-white" /></div>
                   </div>
-                  <div className="text-left">
+                  <div className="text-start">
                     <p className="text-base font-bold group-hover:text-cyan-500 transition-colors leading-tight">{student.name}</p>
-                    <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mt-1 opacity-60">{student.role}</p>
+                    <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mt-1 opacity-60">{student.role === 'Faculty' ? t.faculty : student.role}</p>
                   </div>
                 </div>
                 <span className="text-sm font-black text-cyan-500">{student.karma}</span>
@@ -240,11 +244,11 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
       {showReplyModal && (
         <div className="fixed inset-0 z-[400] flex items-center justify-center p-8 bg-slate-950/98 backdrop-blur-2xl">
            <div className="glass w-full max-w-3xl p-12 rounded-[4rem] border-cyan-500/50 space-y-10 animate-in zoom-in duration-500">
-              <h2 className="text-3xl font-bold font-orbitron">Verified Academic Response</h2>
-              <textarea value={replyText} onChange={e => setReplyText(e.target.value)} placeholder="Formulate solution..." rows={10} className="w-full bg-slate-950 border border-white/10 rounded-[2rem] px-8 py-6 text-white text-lg focus:ring-4 ring-cyan-500/20 outline-none" />
+              <h2 className="text-3xl font-bold font-orbitron">{t.expertReply}</h2>
+              <textarea value={replyText} onChange={e => setReplyText(e.target.value)} placeholder="..." rows={10} className="w-full bg-slate-950 border border-white/10 rounded-[2rem] px-8 py-6 text-white text-lg focus:ring-4 ring-cyan-500/20 outline-none" />
               <div className="flex gap-5">
-                 <button onClick={handleReplySubmit} className="flex-1 cyber-gradient py-5 rounded-[2rem] font-black text-white uppercase tracking-widest shadow-2xl">Authenticate & Commit</button>
-                 <button onClick={() => setShowReplyModal(null)} className="px-12 py-5 rounded-[2rem] border border-white/10 font-black uppercase tracking-widest">Discard</button>
+                 <button onClick={handleReplySubmit} className="flex-1 cyber-gradient py-5 rounded-[2rem] font-black text-white uppercase tracking-widest shadow-2xl">{t.submit}</button>
+                 <button onClick={() => setShowReplyModal(null)} className="px-12 py-5 rounded-[2rem] border border-white/10 font-black uppercase tracking-widest">{t.cancel}</button>
               </div>
            </div>
         </div>
@@ -253,14 +257,14 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
       {showAskModal && (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-8 bg-slate-950/90 backdrop-blur-md">
            <div className="glass w-full max-w-2xl p-12 rounded-[4rem] border-cyan-500/30 space-y-10 animate-in zoom-in duration-500">
-              <h2 className="text-3xl font-bold font-orbitron text-center">Submit Engineering Query</h2>
+              <h2 className="text-3xl font-bold font-orbitron text-center">{t.newQuestion}</h2>
               <div className="space-y-6">
-                 <input value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="Topic Header" className="w-full bg-slate-950 border border-white/10 rounded-[1.5rem] px-8 py-5 text-white" />
-                 <textarea value={newText} onChange={e => setNewText(e.target.value)} placeholder="Technical parameters..." rows={6} className="w-full bg-slate-950 border border-white/10 rounded-[1.5rem] px-8 py-5 text-white" />
+                 <input value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder={t.resourceTitle} className="w-full bg-slate-950 border border-white/10 rounded-[1.5rem] px-8 py-5 text-white" />
+                 <textarea value={newText} onChange={e => setNewText(e.target.value)} placeholder={t.resourceDesc} rows={6} className="w-full bg-slate-950 border border-white/10 rounded-[1.5rem] px-8 py-5 text-white" />
               </div>
               <div className="flex gap-5">
-                 <button onClick={handleAskQuestion} className="flex-1 cyber-gradient py-5 rounded-[2rem] font-black text-white uppercase tracking-widest shadow-2xl">Initiate Discussion</button>
-                 <button onClick={() => setShowAskModal(false)} className="px-12 py-5 rounded-[2rem] border border-white/10 font-black uppercase tracking-widest">Cancel</button>
+                 <button onClick={handleAskQuestion} className="flex-1 cyber-gradient py-5 rounded-[2rem] font-black text-white uppercase tracking-widest shadow-2xl">{t.submit}</button>
+                 <button onClick={() => setShowAskModal(false)} className="px-12 py-5 rounded-[2rem] border border-white/10 font-black uppercase tracking-widest">{t.cancel}</button>
               </div>
            </div>
         </div>
@@ -272,44 +276,44 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
 const QuestionCard: React.FC<{ question: Question, canModerate: boolean, canReplyTechnical: boolean, onFeature: (id: string) => void, onReport: any, t: any, currentUser: User, onReply: any }> = ({ question, canModerate, canReplyTechnical, onFeature, onReport, t, currentUser, onReply }) => (
   <div className={`p-10 rounded-[3.5rem] border transition-all shadow-xl group ${question.isFeatured ? 'border-cyan-500/50 bg-cyan-500/10' : 'glass border-white/5 hover:border-white/10'}`}>
     <div className="flex justify-between items-start mb-8">
-      <div className="flex items-center space-x-6">
+      <div className="flex items-center space-x-6 space-x-reverse">
         <div className="w-16 h-16 rounded-[1.5rem] bg-white/5 border border-white/10 flex items-center justify-center font-black text-cyan-500 text-2xl group-hover:scale-110 transition-transform">{question.authorName[0]}</div>
-        <div>
+        <div className="text-start">
           <h4 className="font-bold text-2xl group-hover:text-cyan-400 transition-colors mb-2 tracking-tight">{question.title}</h4>
           <p className="text-[11px] text-slate-500 font-black uppercase tracking-[0.2em] opacity-60">Engineering Cluster • {question.timestamp.toLocaleDateString()}</p>
         </div>
       </div>
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-4 space-x-reverse">
          {canModerate && (
            <button onClick={() => onFeature(question.id)} className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${question.isFeatured ? 'bg-cyan-500 text-white border-cyan-500' : 'border-cyan-500/30 text-cyan-500 hover:bg-cyan-500/10'}`}>
-              {question.isFeatured ? 'Pinned' : 'Pin Topic'}
+              {question.isFeatured ? t.featureQuestion : t.featureQuestion}
            </button>
          )}
          <button onClick={() => onReport({ reporterId: currentUser.id, reporterName: currentUser.name, targetId: question.id, targetTitle: question.title, targetType: 'Question', reason: 'Technical Content Flag' })} className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-slate-500 hover:text-red-500 transition-all border border-transparent hover:border-red-500/20"><Icons.Flag className="w-5 h-5" /></button>
       </div>
     </div>
-    <p className="text-slate-400 text-lg leading-relaxed mb-10 pl-2 opacity-90">{question.text}</p>
+    <p className="text-slate-400 text-lg leading-relaxed mb-10 pl-2 opacity-90 text-start">{question.text}</p>
     
     <div className="flex items-center justify-between pt-10 border-t border-white/5">
-       <div className="flex items-center space-x-5">
-          <div className="flex -space-x-4">
+       <div className="flex items-center space-x-5 space-x-reverse">
+          <div className="flex -space-x-4 rtl:space-x-reverse">
             {question.answers.length > 0 ? (
               question.answers.map((ans, i) => <img key={i} src={`https://i.pravatar.cc/150?u=${ans.authorId}`} className="w-10 h-10 rounded-full border-2 border-slate-900 object-cover" />)
             ) : (
               <div className="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-900 flex items-center justify-center text-slate-600"><Icons.Robot className="w-5 h-5" /></div>
             )}
           </div>
-          <span className="text-xs font-black text-slate-500 uppercase tracking-widest">{question.answers.length} Academic Insights</span>
+          <span className="text-xs font-black text-slate-500 uppercase tracking-widest">{question.answers.length} {t.answered}</span>
        </div>
        
        {question.status === 'Unanswered' ? (
          canReplyTechnical ? (
-           <button onClick={onReply} className="cyber-gradient px-10 py-4 rounded-[1.5rem] text-white text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl">Submit Professional Audit</button>
+           <button onClick={onReply} className="cyber-gradient px-10 py-4 rounded-[1.5rem] text-white text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl">{t.submit}</button>
          ) : (
-           <div className="px-6 py-3 rounded-xl bg-slate-900/50 border border-white/5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Awaiting Expert Verification</div>
+           <div className="px-6 py-3 rounded-xl bg-slate-900/50 border border-white/5 text-[10px] font-black text-slate-500 uppercase tracking-widest">{t.waitingModerator}</div>
          )
        ) : (
-          <button onClick={onReply} className="px-8 py-3 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-white/10 transition-all">Contribute Insight</button>
+          <button onClick={onReply} className="px-8 py-3 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-white/10 transition-all">{t.submit}</button>
        )}
     </div>
 
@@ -320,15 +324,15 @@ const QuestionCard: React.FC<{ question: Question, canModerate: boolean, canRepl
              {ans.authorRole !== 'Student' && (
                <div className="absolute top-0 right-0 px-6 py-2 bg-cyan-500 rounded-bl-3xl text-[10px] font-black text-white uppercase tracking-[0.3em] shadow-xl">Faculty Validated</div>
              )}
-             <div className="flex items-center space-x-4 mb-5">
+             <div className="flex items-center space-x-4 space-x-reverse mb-5">
                 <img src={`https://i.pravatar.cc/150?u=${ans.authorId}`} className="w-10 h-10 rounded-xl object-cover border border-white/10" />
-                <div>
+                <div className="text-start">
                   <span className="text-base font-black text-cyan-400 uppercase tracking-tight block">{ans.authorName}</span>
-                  <span className="text-[10px] text-slate-600 font-black uppercase tracking-widest">{ans.authorRole} • Verified Contributor</span>
+                  <span className="text-[10px] text-slate-600 font-black uppercase tracking-widest">{ans.authorRole === 'Faculty' ? t.faculty : ans.authorRole} • Verified Contributor</span>
                 </div>
                 {ans.isVerified && <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500"><Icons.Check className="w-4 h-4" /></div>}
              </div>
-             <p className="text-base text-slate-300 leading-relaxed font-medium pl-2">{ans.text}</p>
+             <p className="text-base text-slate-300 leading-relaxed font-medium pl-2 text-start">{ans.text}</p>
           </div>
         ))}
       </div>

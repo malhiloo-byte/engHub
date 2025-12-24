@@ -24,18 +24,21 @@ const App: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [lang, setLang] = useState<'en' | 'ar'>('en');
   
-  const [reports, setReports] = useState<Report[]>(MOCK_REPORTS);
   const [projects, setProjects] = useState<ProjectIdea[]>(MOCK_PROJECTS);
   const [questions, setQuestions] = useState<Question[]>(MOCK_QUESTIONS);
   const [courses, setCourses] = useState<Course[]>(MOCK_COURSES);
   const [challenge, setChallenge] = useState<WeeklyChallenge>(MOCK_CHALLENGE);
   
   const [viewingUser, setViewingUser] = useState<User | null>(null);
-  const t = TRANSLATIONS.en; // Defaulting to EN but structure ready for translation
+  
+  // Use the translations based on active language
+  const t = TRANSLATIONS[lang];
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
-  }, [theme]);
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = lang;
+  }, [theme, lang]);
 
   useEffect(() => {
     localStorage.setItem('cyberhub_users', JSON.stringify(allUsers));
@@ -56,7 +59,7 @@ const App: React.FC = () => {
     setAllUsers(updatedUsers);
     
     if (currentUser?.id === userId) {
-      alert(`Role Updated to ${newRole}. Re-authentication required.`);
+      alert(lang === 'ar' ? `تم تحديث دورك إلى ${newRole}. يرجى إعادة تسجيل الدخول.` : `Role Updated to ${newRole}. Re-authentication required.`);
       handleLogout();
     } else if (viewingUser?.id === userId) {
       setViewingUser(prev => prev ? { ...prev, role: newRole } : null);
@@ -170,7 +173,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className={`min-h-screen ${lang === 'ar' ? 'pr-20' : 'pl-20'} bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300`}>
+    <div className={`min-h-screen ${lang === 'ar' ? 'pr-20' : 'pl-20'} bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300`} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <Sidebar 
         activeTab={activeTab} 
         setActiveTab={(tab) => { setActiveTab(tab); setViewingUser(null); }} 
@@ -183,16 +186,16 @@ const App: React.FC = () => {
 
       <main className="max-w-7xl mx-auto px-8 py-10">
         <header className="flex justify-between items-center mb-12">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-orbitron font-bold cyber-text-gradient">CyberHub</h1>
+          <div className="flex items-center space-x-4 space-x-reverse">
+            <h1 className="text-2xl font-orbitron font-bold cyber-text-gradient">{t.title}</h1>
             <span className="h-6 w-[1px] bg-slate-200 dark:bg-white/10" />
             <p className="text-slate-500 text-sm font-medium">{t.academicExcellence}</p>
           </div>
-          <div onClick={() => { setViewingUser(null); setActiveTab('profile'); }} className="flex items-center space-x-3 bg-white dark:bg-white/5 p-1.5 pr-5 pl-1.5 rounded-full border border-slate-200 dark:border-white/5 cursor-pointer hover:border-cyan-500/50 transition-all">
+          <div onClick={() => { setViewingUser(null); setActiveTab('profile'); }} className="flex items-center space-x-3 space-x-reverse bg-white dark:bg-white/5 p-1.5 pr-5 pl-1.5 rounded-full border border-slate-200 dark:border-white/5 cursor-pointer hover:border-cyan-500/50 transition-all">
             <img src={currentUser.avatar} className="w-10 h-10 rounded-full border border-white/10 object-cover" />
             <div className="flex flex-col">
               <span className="text-xs font-bold">{currentUser.name}</span>
-              <span className="text-[9px] font-bold text-cyan-500 uppercase">{currentUser.role}</span>
+              <span className="text-[9px] font-bold text-cyan-500 uppercase">{currentUser.role === 'Faculty' ? t.faculty : currentUser.role}</span>
             </div>
           </div>
         </header>
@@ -257,7 +260,7 @@ const App: React.FC = () => {
         )}
       </main>
 
-      <div className="fixed bottom-10 right-10 flex flex-col items-end space-y-4 z-50">
+      <div className={`fixed bottom-10 ${lang === 'ar' ? 'left-10' : 'right-10'} flex flex-col items-end space-y-4 z-50`}>
         <button onClick={handleLogout} className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-lg">
            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
         </button>
@@ -267,7 +270,7 @@ const App: React.FC = () => {
       </div>
 
       {isChatOpen && (
-        <div className="fixed bottom-32 right-10 w-[24rem] z-[60] animate-in slide-in-from-bottom-10 duration-300">
+        <div className={`fixed bottom-32 ${lang === 'ar' ? 'left-10' : 'right-10'} w-[24rem] z-[60] animate-in slide-in-from-bottom-10 duration-300`}>
            <ChatAssistant t={t} currentUser={currentUser} onReport={() => {}} />
         </div>
       )}
