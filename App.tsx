@@ -129,7 +129,6 @@ const App: React.FC = () => {
     addToast(lang === 'ar' ? 'تم نشر موضوعك' : 'Topic Published', 'success');
   };
 
-  // Fix: Added handleFeatureQuestion
   const handleFeatureQuestion = (qId: string) => {
     setQuestions(prev => prev.map(q => q.id === qId ? { ...q, isFeatured: !q.isFeatured } : q));
     addToast(lang === 'ar' ? 'تم تحديث حالة التمييز' : 'Featured status updated', 'info');
@@ -148,7 +147,6 @@ const App: React.FC = () => {
     addToast(lang === 'ar' ? 'تمت إضافة ردك' : 'Reply added', 'success');
   };
 
-  // Fix: Added handleJoinMeetingRequest
   const handleJoinMeetingRequest = () => {
     if (!currentUser) return;
     setChallenge(prev => ({
@@ -161,7 +159,6 @@ const App: React.FC = () => {
     addToast(lang === 'ar' ? 'تم إرسال طلب الانضمام' : 'Join request sent', 'info');
   };
 
-  // Fix: Added handleMeetingPermission
   const handleMeetingPermission = (userId: string, action: 'Accept' | 'Reject') => {
     setChallenge(prev => ({
       ...prev,
@@ -170,7 +167,6 @@ const App: React.FC = () => {
     addToast(action === 'Accept' ? 'User accepted' : 'User rejected', 'info');
   };
 
-  // Fix: Added handleAddResource
   const handleAddResource = (courseId: string, resource: Partial<CourseResource>) => {
     if (!currentUser) return;
     const newRes: CourseResource = {
@@ -190,7 +186,6 @@ const App: React.FC = () => {
     addToast(newRes.status === 'Approved' ? 'Resource added' : 'Resource submitted for review', 'success');
   };
 
-  // Fix: Added handleApproveResource
   const handleApproveResource = (courseId: string, resourceId: string, action: 'Approve' | 'Reject') => {
     setCourses(prev => prev.map(c => c.id === courseId ? {
       ...c,
@@ -199,12 +194,12 @@ const App: React.FC = () => {
     addToast(action === 'Approve' ? 'Resource Approved' : 'Resource Rejected', 'info');
   };
 
-  // Fix: Added onViewUser
   const onViewUser = (userId: string) => {
     const user = allUsers.find(u => u.id === userId);
     if (user) {
       setViewingUser(user);
       setActiveTab('profile');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -254,22 +249,45 @@ const App: React.FC = () => {
           <div className="animate-in fade-in duration-700 space-y-16">
              <Roadmaps currentUser={currentUser} onUpdateProgress={handleUpdateRoadmap} t={t} />
              
-             <section className="space-y-8">
-               <h3 className="text-2xl font-bold font-orbitron flex items-center gap-4">
-                 <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-                 {t.recentActivity}
-               </h3>
-               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                 {questions.slice(0, 3).map(q => (
-                   <div key={q.id} className="glass p-6 rounded-[2rem] border-white/5 hover:border-cyan-500/20 transition-all cursor-pointer" onClick={() => setActiveTab('community')}>
-                      <p className="text-[10px] font-black uppercase text-cyan-500 mb-2">FORUM TRANSMISSION</p>
-                      <h4 className="font-bold text-sm mb-2 line-clamp-1">{q.title}</h4>
-                      <p className="text-xs text-slate-500 mb-4 line-clamp-2">{q.text}</p>
-                      <button className="text-[10px] font-bold text-slate-400 hover:text-white uppercase">Interrogate Node →</button>
-                   </div>
-                 ))}
-               </div>
-             </section>
+             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                <section className="lg:col-span-2 space-y-8">
+                  <h3 className="text-2xl font-bold font-orbitron flex items-center gap-4">
+                    <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+                    {t.recentActivity}
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {questions.slice(0, 4).map(q => (
+                      <div key={q.id} className="glass p-6 rounded-[2rem] border-white/5 hover:border-cyan-500/20 transition-all cursor-pointer" onClick={() => setActiveTab('community')}>
+                          <p className="text-[10px] font-black uppercase text-cyan-500 mb-2">FORUM TRANSMISSION</p>
+                          <h4 className="font-bold text-sm mb-2 line-clamp-1">{q.title}</h4>
+                          <p className="text-xs text-slate-500 mb-4 line-clamp-2">{q.text}</p>
+                          <div className="flex justify-between items-center">
+                             <span className="text-[9px] text-slate-600 font-bold uppercase">{new Date(q.timestamp).toLocaleDateString()}</span>
+                             <button className="text-[10px] font-black text-slate-400 hover:text-white uppercase">READ NODE →</button>
+                          </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <aside className="space-y-8">
+                  <h3 className="text-2xl font-bold font-orbitron flex items-center gap-4 text-red-500">
+                    <Icons.Shield className="w-6 h-6" />
+                    Threat Feed
+                  </h3>
+                  <div className="glass p-8 rounded-[3rem] border-red-500/10 space-y-6">
+                     <div className="p-4 bg-red-500/5 rounded-2xl border border-red-500/10">
+                        <p className="text-[10px] font-black text-red-500 uppercase mb-1">CVE-2024-XXXX</p>
+                        <p className="text-xs font-bold">New RCE found in popular AI framework.</p>
+                     </div>
+                     <div className="p-4 bg-blue-500/5 rounded-2xl border border-blue-500/10">
+                        <p className="text-[10px] font-black text-blue-500 uppercase mb-1">AI NEWS</p>
+                        <p className="text-xs font-bold">Gemini 3.0 Pro preview released for developers.</p>
+                     </div>
+                     <button onClick={() => setActiveTab('ai')} className="w-full text-center py-3 text-[10px] font-black text-slate-500 hover:text-cyan-500 transition-colors uppercase">View Global Feed</button>
+                  </div>
+                </aside>
+             </div>
           </div>
         )}
 
@@ -321,7 +339,7 @@ const App: React.FC = () => {
             allUsers={allUsers} 
             handleUpdateRole={handleUpdateRole} 
             onUpdateUser={(u) => { setCurrentUser(u); setAllUsers(prev => prev.map(user => user.id === u.id ? u : user)); }} 
-            onActivityClick={() => {}} 
+            onActivityClick={(id, type) => { if(type === 'Question') setActiveTab('community'); }} 
             onViewUser={onViewUser} 
             isSelf={!viewingUser || viewingUser.id === currentUser.id} 
             t={t} 
