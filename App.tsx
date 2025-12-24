@@ -267,7 +267,7 @@ const App: React.FC = () => {
                      </div>
                      <div className="p-4 bg-blue-500/5 rounded-2xl border border-blue-500/10">
                         <p className="text-[10px] font-black text-blue-500 uppercase mb-1">AI NEWS</p>
-                        <p className="text-xs font-bold">New paper on Adversarial Attacks in LLMs.</p>
+                        <p className="text-xs font-bold">New research on Prompt Injection mitigation.</p>
                      </div>
                      <button onClick={() => setActiveTab('ai')} className="w-full text-center py-3 text-[10px] font-black text-slate-500 hover:text-cyan-500 transition-colors uppercase">View Security Bulletin</button>
                   </div>
@@ -324,7 +324,7 @@ const App: React.FC = () => {
             allUsers={allUsers} 
             handleUpdateRole={handleUpdateRole} 
             onUpdateUser={(u) => { setCurrentUser(u); setAllUsers(prev => prev.map(user => user.id === u.id ? u : user)); }} 
-            onActivityClick={(id, type) => { if(type === 'Question') setActiveTab('community'); }} 
+            onActivityClick={(linkId, type) => { if(type === 'Question') setActiveTab('community'); }} 
             onViewUser={onViewUser} 
             isSelf={!viewingUser || viewingUser.id === currentUser.id} 
             t={t} 
@@ -343,7 +343,7 @@ const App: React.FC = () => {
         )}
       </main>
 
-      {/* Persistent AI Chat Toggle */}
+      {/* Persistent UI elements */}
       <div className={`fixed bottom-10 ${lang === 'ar' ? 'left-10' : 'right-10'} flex flex-col items-end space-y-4 z-50`}>
         <button onClick={handleLogout} className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-lg">
            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>

@@ -21,9 +21,8 @@ const RadarChart: React.FC<RadarChartProps> = ({ scores, t }) => {
     });
   };
 
-  // Fixed: use t prop instead of missing T import
   const labels = [t.radarNetwork, t.radarCrypto, t.radarProgramming, t.radarAI, t.radarAppSec];
-  const values = [scores.network, scores.crypto, scores.programming, scores.ai, scores.appSec];
+  const values = [scores.network || 0, scores.crypto || 0, scores.programming || 0, scores.ai || 0, scores.appSec || 0];
 
   const gridPoints = [1, 0.75, 0.5, 0.25].map(scale => 
     getPoints([100, 100, 100, 100, 100], scale).map(p => p.join(',')).join(' ')
@@ -47,7 +46,7 @@ const RadarChart: React.FC<RadarChartProps> = ({ scores, t }) => {
         {/* Data Shape */}
         <polygon 
           points={dataPoints} 
-          className="fill-cyan-500/30 stroke-cyan-500 stroke-2" 
+          className="fill-cyan-500/30 stroke-cyan-500 stroke-2 transition-all duration-700" 
         />
 
         {/* Labels */}
