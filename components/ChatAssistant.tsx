@@ -11,8 +11,8 @@ interface ChatAssistantProps {
 }
 
 const ChatAssistant: React.FC<ChatAssistantProps> = ({ t, currentUser, onReport }) => {
-  const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: 'Welcome to "Ask Cyber". I am your academic AI engine. How can I help you today?', timestamp: new Date() }
+  const [messages, setMessages] = useState<(Message & { sources?: any[] })[]>([
+    { role: 'model', text: 'Welcome to "Ask Cyber". I am your academic AI engine with real-time search capabilities. How can I help you today?', timestamp: new Date() }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +24,6 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ t, currentUser, onReport 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
-    // Detection for complaints
     if (input.toLowerCase().includes('report') || input.toLowerCase().includes('بلاغ') || input.toLowerCase().includes('شكوى')) {
        onReport({ reporterId: currentUser.id, reporterName: currentUser.name, targetId: 'AI Chat', targetTitle: 'Direct Complaint', targetType: 'Complaint', reason: input });
        setMessages(prev => [...prev, { role: 'user', text: input, timestamp: new Date() }, { role: 'model', text: 'Thank you. Your report has been submitted to the Owner, Faculty, and Experts for immediate action.', timestamp: new Date() }]);
@@ -32,13 +31,13 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ t, currentUser, onReport 
        return;
     }
 
-    const prompt = isAudit ? `SECURITY AUDIT: \n\n${input}` : input;
+    const prompt = isAudit ? `SECURITY AUDIT THIS CODE AND SEARCH FOR RELEVANT CVEs: \n\n${input}` : input;
     setMessages(prev => [...prev, { role: 'user', text: input, timestamp: new Date() }]);
     setInput('');
     setIsLoading(true);
 
-    const response = await getAcademicAssistantResponse(prompt, messages.map(m => ({ role: m.role, parts: [{ text: m.text }] })));
-    setMessages(prev => [...prev, { role: 'model', text: response || '', timestamp: new Date() }]);
+    const result = await getAcademicAssistantResponse(prompt, messages.map(m => ({ role: m.role, parts: [{ text: m.text }] })));
+    setMessages(prev => [...prev, { role: 'model', text: result.text || '', sources: result.sources, timestamp: new Date() }]);
     setIsLoading(false);
   };
 
@@ -57,9 +56,30 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ t, currentUser, onReport 
           <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[85%] p-4 rounded-3xl shadow-lg ${m.role === 'user' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-200 rounded-tl-none prose prose-slate dark:prose-invert prose-sm'}`}>
               <div className="leading-relaxed whitespace-pre-wrap">{m.text}</div>
+              {m.sources && m.sources.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <p className="text-[10px] font-black text-cyan-500 uppercase mb-2">{t.sources}</p>
+                  <div className="flex flex-col gap-1">
+                    {m.sources.map((src, idx) => (
+                      <a key={idx} href={src.web?.uri} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-400 hover:underline flex items-center gap-1">
+                        <Icons.Globe className="w-3 h-3" /> {src.web?.title || 'External Source'}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         ))}
+        {isLoading && (
+          <div className="flex justify-start">
+             <div className="bg-white dark:bg-slate-900 p-4 rounded-3xl animate-pulse flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-cyan-500 animate-bounce" />
+                <div className="w-2 h-2 rounded-full bg-cyan-500 animate-bounce delay-75" />
+                <div className="w-2 h-2 rounded-full bg-cyan-500 animate-bounce delay-150" />
+             </div>
+          </div>
+        )}
       </div>
 
       <div className="p-4 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/80 backdrop-blur-xl">

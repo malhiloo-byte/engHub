@@ -8,8 +8,16 @@ import Coordination from './components/Coordination';
 import Profile from './components/Profile';
 import Roadmaps from './components/Roadmaps';
 import Auth from './components/Auth';
+import OwnerDashboard from './components/OwnerDashboard';
+import Pathfinder from './components/Pathfinder';
 import { Icons, MOCK_STUDENTS, TRANSLATIONS, MOCK_REPORTS, MOCK_PROJECTS, MOCK_QUESTIONS, MOCK_COURSES, MOCK_CHALLENGE } from './constants';
 import { User, UserRole, Report, ProjectIdea, Question, Course, CourseResource, WeeklyChallenge } from './types';
+
+interface Toast {
+  id: string;
+  message: string;
+  type: 'success' | 'error' | 'info';
+}
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -23,15 +31,16 @@ const App: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [lang, setLang] = useState<'en' | 'ar'>('en');
+  const [toasts, setToasts] = useState<Toast[]>([]);
   
   const [projects, setProjects] = useState<ProjectIdea[]>(MOCK_PROJECTS);
   const [questions, setQuestions] = useState<Question[]>(MOCK_QUESTIONS);
   const [courses, setCourses] = useState<Course[]>(MOCK_COURSES);
   const [challenge, setChallenge] = useState<WeeklyChallenge>(MOCK_CHALLENGE);
+  const [reports, setReports] = useState<Report[]>(MOCK_REPORTS);
   
   const [viewingUser, setViewingUser] = useState<User | null>(null);
   
-  // Use the translations based on active language
   const t = TRANSLATIONS[lang];
 
   useEffect(() => {
@@ -44,22 +53,33 @@ const App: React.FC = () => {
     localStorage.setItem('cyberhub_users', JSON.stringify(allUsers));
   }, [allUsers]);
 
+  const addToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    const id = Date.now().toString();
+    setToasts(prev => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 4000);
+  };
+
   const handleLogin = (user: User) => {
     const dbUser = allUsers.find(u => u.email === user.email);
-    setCurrentUser(dbUser || user);
+    const finalUser = dbUser || user;
+    setCurrentUser(finalUser);
     setIsLoggedIn(true);
+    addToast(lang === 'ar' ? `مرحباً بك مجدداً، ${finalUser.name}` : `Welcome back, ${finalUser.name}`, 'success');
   };
 
   const handleRegister = (user: User) => {
     setAllUsers(prev => [...prev, user]);
+    addToast(lang === 'ar' ? 'تم إنشاء الحساب بنجاح' : 'Account created successfully', 'success');
   };
 
   const handleUpdateRole = (userId: string, newRole: UserRole) => {
     const updatedUsers = allUsers.map(u => u.id === userId ? { ...u, role: newRole } : u);
     setAllUsers(updatedUsers);
+    addToast(lang === 'ar' ? 'تم تحديث صلاحيات المستخدم' : 'User permissions updated', 'info');
     
     if (currentUser?.id === userId) {
-      alert(lang === 'ar' ? `تم تحديث دورك إلى ${newRole}. يرجى إعادة تسجيل الدخول.` : `Role Updated to ${newRole}. Re-authentication required.`);
       handleLogout();
     } else if (viewingUser?.id === userId) {
       setViewingUser(prev => prev ? { ...prev, role: newRole } : null);
@@ -71,6 +91,7 @@ const App: React.FC = () => {
     setCurrentUser(null);
     setViewingUser(null);
     setActiveTab('home');
+    addToast(lang === 'ar' ? 'تم تسجيل الخروج بأمان' : 'Log out successful');
   };
 
   const handleUpdateRoadmap = (stepId: string) => {
@@ -85,6 +106,7 @@ const App: React.FC = () => {
     };
     setCurrentUser(updated);
     setAllUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
+    addToast(isDone ? '-10 Karma' : '+50 Karma Points!', isDone ? 'info' : 'success');
   };
 
   const handleJoinProject = (projectId: string) => {
@@ -95,20 +117,22 @@ const App: React.FC = () => {
       joinedProjects: isJoined
         ? currentUser.joinedProjects?.filter(id => id !== projectId)
         : [...(currentUser.joinedProjects || []), projectId],
-      karma: isJoined ? currentUser.karma - 5 : currentUser.karma + 20
     };
     setCurrentUser(updated);
     setAllUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, filledSlots: p.filledSlots + (isJoined ? -1 : 1) } : p));
+    addToast(isJoined ? (lang === 'ar' ? 'غادرت المشروع' : 'Left Project') : (lang === 'ar' ? 'انضممت للمشروع' : 'Joined Team!'), 'info');
   };
 
   const handleAddQuestion = (q: Question) => {
     setQuestions(prev => [q, ...prev]);
-    if (currentUser) {
-      const updated = { ...currentUser, karma: currentUser.karma + 10 };
-      setCurrentUser(updated);
-      setAllUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
-    }
+    addToast(lang === 'ar' ? 'تم نشر موضوعك' : 'Topic Published', 'success');
+  };
+
+  // Fix: Added handleFeatureQuestion
+  const handleFeatureQuestion = (qId: string) => {
+    setQuestions(prev => prev.map(q => q.id === qId ? { ...q, isFeatured: !q.isFeatured } : q));
+    addToast(lang === 'ar' ? 'تم تحديث حالة التمييز' : 'Featured status updated', 'info');
   };
 
   const handleReplyQuestion = (qId: string, text: string) => {
@@ -121,55 +145,80 @@ const App: React.FC = () => {
         text, timestamp: new Date(), isVerified: currentUser.role !== 'Student', upvotes: 0
       }]
     } : q));
+    addToast(lang === 'ar' ? 'تمت إضافة ردك' : 'Reply added', 'success');
   };
 
-  const handleFeatureQuestion = (qId: string) => {
-    setQuestions(prev => prev.map(q => q.id === qId ? { ...q, isFeatured: !q.isFeatured } : q));
-  };
-
+  // Fix: Added handleJoinMeetingRequest
   const handleJoinMeetingRequest = () => {
     if (!currentUser) return;
     setChallenge(prev => ({
       ...prev,
-      joinRequests: [...prev.joinRequests, { userId: currentUser.id, userName: currentUser.name, status: 'Pending' }]
+      joinRequests: [
+        ...prev.joinRequests.filter(r => r.userId !== currentUser.id),
+        { userId: currentUser.id, userName: currentUser.name, status: 'Pending' }
+      ]
     }));
+    addToast(lang === 'ar' ? 'تم إرسال طلب الانضمام' : 'Join request sent', 'info');
   };
 
+  // Fix: Added handleMeetingPermission
   const handleMeetingPermission = (userId: string, action: 'Accept' | 'Reject') => {
     setChallenge(prev => ({
       ...prev,
       joinRequests: prev.joinRequests.map(r => r.userId === userId ? { ...r, status: action === 'Accept' ? 'Accepted' : 'Rejected' } : r)
     }));
+    addToast(action === 'Accept' ? 'User accepted' : 'User rejected', 'info');
   };
 
-  const onViewUser = (id: string) => {
-    const found = allUsers.find(u => u.id === id);
-    if (found) {
-      setViewingUser(found);
+  // Fix: Added handleAddResource
+  const handleAddResource = (courseId: string, resource: Partial<CourseResource>) => {
+    if (!currentUser) return;
+    const newRes: CourseResource = {
+      id: `res-${Date.now()}`,
+      name: resource.name || 'Untitled',
+      type: (resource.type as any) || 'Explanation',
+      url: resource.url || '',
+      status: (currentUser.role === 'Faculty' || currentUser.role === 'Owner') ? 'Approved' : 'Pending',
+      origin: (resource.origin as any) || 'Practical',
+      authorName: currentUser.name,
+      authorRole: currentUser.role,
+      authorId: currentUser.id,
+      timestamp: new Date(),
+    };
+
+    setCourses(prev => prev.map(c => c.id === courseId ? { ...c, resources: [...c.resources, newRes] } : c));
+    addToast(newRes.status === 'Approved' ? 'Resource added' : 'Resource submitted for review', 'success');
+  };
+
+  // Fix: Added handleApproveResource
+  const handleApproveResource = (courseId: string, resourceId: string, action: 'Approve' | 'Reject') => {
+    setCourses(prev => prev.map(c => c.id === courseId ? {
+      ...c,
+      resources: c.resources.map(r => r.id === resourceId ? { ...r, status: action === 'Approve' ? 'Approved' : 'Rejected' } : r)
+    } : c));
+    addToast(action === 'Approve' ? 'Resource Approved' : 'Resource Rejected', 'info');
+  };
+
+  // Fix: Added onViewUser
+  const onViewUser = (userId: string) => {
+    const user = allUsers.find(u => u.id === userId);
+    if (user) {
+      setViewingUser(user);
       setActiveTab('profile');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
-  const handleAddResource = (courseId: string, res: any) => {
-    const newRes: CourseResource = {
-      ...res,
-      id: `res-${Date.now()}`,
-      timestamp: new Date(),
-      status: (currentUser?.role !== 'Student') ? 'Approved' : 'Pending'
-    };
-    setCourses(prev => prev.map(c => c.id === courseId ? { ...c, resources: [newRes, ...c.resources] } : c));
-  };
-
-  const handleApproveResource = (courseId: string, resId: string, action: 'Approve' | 'Reject') => {
-    setCourses(prev => prev.map(c => c.id === courseId ? {
-      ...c,
-      resources: c.resources.map(r => r.id === resId ? { ...r, status: action === 'Approve' ? 'Approved' : 'Rejected' } : r)
-    } : c));
+  const handleBroadcast = (msg: string) => {
+    addToast(msg, 'info');
   };
 
   if (!isLoggedIn || !currentUser) {
-    return <Auth onLogin={handleLogin} existingUsers={allUsers} onRegister={handleRegister} />;
+    return (
+      <>
+        <Auth onLogin={handleLogin} existingUsers={allUsers} onRegister={handleRegister} lang={lang} />
+        <ToastContainer toasts={toasts} />
+      </>
+    );
   }
 
   return (
@@ -182,6 +231,7 @@ const App: React.FC = () => {
         lang={lang}
         toggleLang={() => setLang(lang === 'ar' ? 'en' : 'ar')}
         t={t} 
+        userRole={currentUser.role}
       />
 
       <main className="max-w-7xl mx-auto px-8 py-10">
@@ -201,8 +251,25 @@ const App: React.FC = () => {
         </header>
 
         {activeTab === 'home' && (
-          <div className="animate-in fade-in duration-700">
+          <div className="animate-in fade-in duration-700 space-y-16">
              <Roadmaps currentUser={currentUser} onUpdateProgress={handleUpdateRoadmap} t={t} />
+             
+             <section className="space-y-8">
+               <h3 className="text-2xl font-bold font-orbitron flex items-center gap-4">
+                 <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+                 {t.recentActivity}
+               </h3>
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                 {questions.slice(0, 3).map(q => (
+                   <div key={q.id} className="glass p-6 rounded-[2rem] border-white/5 hover:border-cyan-500/20 transition-all cursor-pointer" onClick={() => setActiveTab('community')}>
+                      <p className="text-[10px] font-black uppercase text-cyan-500 mb-2">FORUM TRANSMISSION</p>
+                      <h4 className="font-bold text-sm mb-2 line-clamp-1">{q.title}</h4>
+                      <p className="text-xs text-slate-500 mb-4 line-clamp-2">{q.text}</p>
+                      <button className="text-[10px] font-bold text-slate-400 hover:text-white uppercase">Interrogate Node →</button>
+                   </div>
+                 ))}
+               </div>
+             </section>
           </div>
         )}
 
@@ -211,7 +278,7 @@ const App: React.FC = () => {
             currentUser={currentUser} 
             questions={questions} 
             onAddQuestion={handleAddQuestion} 
-            onReport={() => {}} 
+            onReport={(rep) => { setReports(prev => [{...rep, id: Date.now().toString(), timestamp: new Date(), status: 'Pending'}, ...prev]); addToast(lang === 'ar' ? 'تم إرسال البلاغ للمراجعة' : 'Report submitted for audit', 'info'); }} 
             onViewUser={onViewUser} 
             onFeatureQuestion={handleFeatureQuestion} 
             onReplyQuestion={handleReplyQuestion} 
@@ -243,7 +310,9 @@ const App: React.FC = () => {
           />
         )}
 
-        {activeTab === 'ai' && <ChatAssistant t={t} currentUser={currentUser} onReport={() => {}} />}
+        {activeTab === 'ai' && <ChatAssistant t={t} currentUser={currentUser} onReport={(rep) => { setReports(prev => [{...rep, id: Date.now().toString(), timestamp: new Date(), status: 'Pending'}, ...prev]); addToast(lang === 'ar' ? 'تم إرسال البلاغ للمراجعة' : 'Report submitted for audit', 'info'); }} />}
+
+        {activeTab === 'pathfinder' && <Pathfinder t={t} />}
 
         {activeTab === 'profile' && (
           <Profile 
@@ -255,6 +324,17 @@ const App: React.FC = () => {
             onActivityClick={() => {}} 
             onViewUser={onViewUser} 
             isSelf={!viewingUser || viewingUser.id === currentUser.id} 
+            t={t} 
+          />
+        )}
+
+        {activeTab === 'dashboard' && currentUser.role === 'Owner' && (
+          <OwnerDashboard 
+            reports={reports} 
+            students={allUsers} 
+            onUpdateRole={handleUpdateRole} 
+            onBroadcast={handleBroadcast}
+            onResolveReport={(id, action) => { setReports(prev => prev.filter(r => r.id !== id)); addToast(action === 'Dismiss' ? 'Report Dismissed' : 'Content Removed', 'info'); }}
             t={t} 
           />
         )}
@@ -271,11 +351,27 @@ const App: React.FC = () => {
 
       {isChatOpen && (
         <div className={`fixed bottom-32 ${lang === 'ar' ? 'left-10' : 'right-10'} w-[24rem] z-[60] animate-in slide-in-from-bottom-10 duration-300`}>
-           <ChatAssistant t={t} currentUser={currentUser} onReport={() => {}} />
+           <ChatAssistant t={t} currentUser={currentUser} onReport={(rep) => { setReports(prev => [{...rep, id: Date.now().toString(), timestamp: new Date(), status: 'Pending'}, ...prev]); addToast(lang === 'ar' ? 'تم إرسال البلاغ للمراجعة' : 'Report submitted for audit', 'info'); }} />
         </div>
       )}
+
+      <ToastContainer toasts={toasts} />
     </div>
   );
 };
+
+const ToastContainer: React.FC<{ toasts: Toast[] }> = ({ toasts }) => (
+  <div className="fixed top-10 right-10 z-[1000] flex flex-col gap-4 pointer-events-none">
+    {toasts.map(toast => (
+      <div key={toast.id} className={`p-6 rounded-2xl border backdrop-blur-3xl shadow-2xl animate-in slide-in-from-right-10 duration-300 pointer-events-auto ${
+        toast.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' :
+        toast.type === 'error' ? 'bg-red-500/10 border-red-500/30 text-red-400' :
+        'bg-cyan-500/10 border-cyan-500/30 text-cyan-400'
+      }`}>
+        <p className="text-xs font-black uppercase tracking-widest">{toast.message}</p>
+      </div>
+    ))}
+  </div>
+);
 
 export default App;

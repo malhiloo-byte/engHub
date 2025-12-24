@@ -1,7 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Question, User, Report, WeeklyChallenge } from '../types';
 import { MOCK_STUDENTS, Icons } from '../constants';
+
+interface ChatMsg {
+  sender: string;
+  text: string;
+  isSelf: boolean;
+}
 
 interface CommunityProps {
   currentUser: User;
@@ -27,9 +33,18 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
   const [replyText, setReplyText] = useState('');
   const [showAllAnswered, setShowAllAnswered] = useState(false);
   
-  // Audio/Video States for Meeting
+  // Meeting Features
   const [isMuted, setIsMuted] = useState(true);
   const [isCamOff, setIsCamOff] = useState(true);
+  const [meetingChat, setMeetingChat] = useState<ChatMsg[]>([
+    { sender: 'System', text: 'Encrypted tunnel established.', isSelf: false }
+  ]);
+  const [chatInput, setChatInput] = useState('');
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (chatEndRef.current) chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+  }, [meetingChat]);
 
   const canReplyTechnical = currentUser.role === 'Owner' || currentUser.role === 'Faculty' || currentUser.role === 'Expert';
   const canModerate = currentUser.role === 'Faculty' || currentUser.role === 'Owner';
@@ -37,27 +52,16 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
   const isClosed = new Date() > challenge.expiresAt;
   const myJoinRequest = challenge.joinRequests.find(r => r.userId === currentUser.id);
 
+  const handleSendChat = () => {
+    if (!chatInput.trim()) return;
+    setMeetingChat(prev => [...prev, { sender: currentUser.name, text: chatInput, isSelf: true }]);
+    setChatInput('');
+  };
+
   const allAnswered = questions.filter(q => q.status === 'Answered');
   const featuredQuestions = allAnswered.filter(q => q.isFeatured);
   const otherAnswered = allAnswered.filter(q => !q.isFeatured);
   const unansweredQuestions = questions.filter(q => q.status === 'Unanswered');
-
-  const handleAskQuestion = () => {
-    if (!newTitle || !newText) return;
-    onAddQuestion({
-      id: `q-${Date.now()}`, authorId: currentUser.id, authorName: currentUser.name, title: newTitle, text: newText,
-      category: 'General', isExpertRequired: true, isFeatured: false, status: 'Unanswered', timestamp: new Date(), answers: []
-    });
-    setShowAskModal(false);
-    setNewTitle(''); setNewText('');
-  };
-
-  const handleReplySubmit = () => {
-    if (!showReplyModal || !replyText) return;
-    onReplyQuestion(showReplyModal.id, replyText);
-    setShowReplyModal(null);
-    setReplyText('');
-  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 animate-in fade-in duration-700">
@@ -100,15 +104,6 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
                          <p className="font-orbitron font-bold text-slate-500 uppercase tracking-[0.5em]">{t.waitingModerator}</p>
                       </div>
                    </div>
-                   {/* Overlay Tags */}
-                   <div className="absolute top-10 right-10 flex gap-4">
-                      <span className="px-5 py-2 bg-red-500 text-white rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                        <div className="w-2 h-2 bg-white rounded-full animate-ping" /> Live Session
-                      </span>
-                      <span className="px-5 py-2 bg-white/5 backdrop-blur-md text-white rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10">
-                        {challenge.title}
-                      </span>
-                   </div>
                    {/* Bottom Controls */}
                    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-6 bg-slate-900/80 backdrop-blur-3xl px-10 py-5 rounded-[2.5rem] border border-white/10 shadow-2xl">
                       <button onClick={() => setIsMuted(!isMuted)} className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${isMuted ? 'bg-red-500/20 text-red-500 border-red-500/20' : 'bg-white/5 text-white'}`}>
@@ -123,61 +118,43 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
                 </div>
              </div>
 
-             {/* Sidebar (Participants & Waiting Room) */}
-             <div className="w-full md:w-[24rem] glass rounded-[3.5rem] border-white/10 p-10 flex flex-col gap-10">
-                <div className="space-y-2 text-start">
-                   <h3 className="text-xl font-bold font-orbitron uppercase tracking-tighter">{t.participants}</h3>
-                   <p className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.3em]">Authorized Members Only</p>
+             {/* Sidebar (Chat & Participants) */}
+             <div className="w-full md:w-[26rem] glass rounded-[3.5rem] border-white/10 p-8 flex flex-col gap-6">
+                <div className="flex bg-white/5 p-1 rounded-2xl border border-white/5">
+                   <div className="flex-1 py-2 text-center text-[10px] font-black uppercase text-cyan-500">{t.liveChat}</div>
                 </div>
                 
-                <div className="flex-1 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
-                   {/* Moderator */}
-                   <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-cyan-500/20 shadow-lg">
-                      <div className="flex items-center gap-4">
-                         <img src="https://i.pravatar.cc/150?u=s3" className="w-10 h-10 rounded-xl object-cover border border-cyan-500/30" />
-                         <div className="text-start"><p className="text-xs font-bold">Dr. Faisal</p><p className="text-[8px] font-black text-cyan-500 uppercase">Moderator</p></div>
+                {/* Chat Feed */}
+                <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+                   {meetingChat.map((msg, i) => (
+                      <div key={i} className={`flex flex-col ${msg.isSelf ? 'items-end' : 'items-start'}`}>
+                         <span className="text-[8px] font-black uppercase text-slate-500 mb-1">{msg.sender}</span>
+                         <div className={`px-4 py-2 rounded-2xl text-xs ${msg.isSelf ? 'bg-cyan-500 text-white rounded-tr-none' : 'bg-white/5 text-slate-300 rounded-tl-none border border-white/5'}`}>
+                            {msg.text}
+                         </div>
                       </div>
-                      <Icons.Shield className="w-4 h-4 text-cyan-500" />
-                   </div>
-
-                   {/* Waiting Room (For Faculty Only) */}
-                   {canModerate && challenge.joinRequests.filter(r => r.status === 'Pending').length > 0 && (
-                     <div className="space-y-4 pt-6 border-t border-white/5 text-start">
-                        <p className="text-[9px] font-black text-yellow-500 uppercase tracking-widest">{t.waitingRoom} ({challenge.joinRequests.filter(r => r.status === 'Pending').length})</p>
-                        {challenge.joinRequests.filter(r => r.status === 'Pending').map(req => (
-                          <div key={req.userId} className="p-5 bg-yellow-500/5 rounded-2xl border border-yellow-500/20 flex flex-col gap-4 animate-in slide-in-from-right-4">
-                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center font-black text-yellow-500 text-xs">{req.userName[0]}</div>
-                                <span className="text-xs font-bold">{req.userName}</span>
-                             </div>
-                             <div className="flex gap-2">
-                                <button onClick={() => onMeetingPermission(req.userId, 'Accept')} className="flex-1 py-2 bg-emerald-500 text-white rounded-xl text-[8px] font-black uppercase">{t.acceptEntry}</button>
-                                <button onClick={() => onMeetingPermission(req.userId, 'Reject')} className="flex-1 py-2 bg-red-500/20 text-red-500 rounded-xl text-[8px] font-black uppercase">{t.denyEntry}</button>
-                             </div>
-                          </div>
-                        ))}
-                     </div>
-                   )}
-
-                   {/* Accepted Members */}
-                   <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest pt-6 border-t border-white/5 text-start">Active in Call</p>
-                   {challenge.joinRequests.filter(r => r.status === 'Accepted').map(req => (
-                     <div key={req.userId} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
-                        <div className="flex items-center gap-4">
-                           <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center font-black text-white text-xs">{req.userName[0]}</div>
-                           <p className="text-xs font-bold text-slate-400">{req.userName}</p>
-                        </div>
-                        <div className="flex gap-2">
-                           <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
-                        </div>
-                     </div>
                    ))}
+                   <div ref={chatEndRef} />
+                </div>
+
+                {/* Chat Input */}
+                <div className="relative">
+                   <input 
+                      value={chatInput} 
+                      onChange={e => setChatInput(e.target.value)} 
+                      onKeyDown={e => e.key === 'Enter' && handleSendChat()}
+                      placeholder={t.typeMessage}
+                      className="w-full bg-slate-900 border border-white/10 rounded-2xl px-6 py-4 text-xs text-white pr-14"
+                   />
+                   <button onClick={handleSendChat} className="absolute right-2 top-2 w-10 h-10 cyber-gradient rounded-xl flex items-center justify-center">
+                      <Icons.Send className="w-4 h-4 text-white" />
+                   </button>
                 </div>
              </div>
           </div>
         )}
 
-        {/* Forum Feed Section Header */}
+        {/* Forum Feed Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
           <div className="flex items-center gap-10">
             <h2 className="text-5xl font-bold font-orbitron tracking-tighter">{t.community}</h2>
@@ -198,25 +175,15 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
               {(showAllAnswered ? otherAnswered : otherAnswered.slice(0, 5)).map(q => (
                 <QuestionCard key={q.id} question={q} canModerate={canModerate} canReplyTechnical={canReplyTechnical} onFeature={onFeatureQuestion} onReport={onReport} t={t} currentUser={currentUser} onReply={() => setShowReplyModal({id: q.id, title: q.title})} />
               ))}
-              {!showAllAnswered && otherAnswered.length > 5 && (
-                <button onClick={() => setShowAllAnswered(true)} className="w-full py-8 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-white/10 text-slate-500 font-black hover:bg-slate-100 dark:hover:bg-white/5 transition-all uppercase text-xs tracking-[0.3em]">{t.showMore}</button>
-              )}
             </>
           ) : (
-            unansweredQuestions.length > 0 ? (
-              unansweredQuestions.map(q => (
-                <QuestionCard key={q.id} question={q} canModerate={canModerate} canReplyTechnical={canReplyTechnical} onFeature={onFeatureQuestion} onReport={onReport} t={t} currentUser={currentUser} onReply={() => setShowReplyModal({id: q.id, title: q.title})} />
-              ))
-            ) : (
-              <div className="text-center py-40 glass rounded-[4rem] border-white/5 opacity-50">
-                 <p className="font-orbitron font-bold text-slate-500 uppercase tracking-widest">Global Queue Clear - All queries answered by experts</p>
-              </div>
-            )
+            unansweredQuestions.map(q => (
+              <QuestionCard key={q.id} question={q} canModerate={canModerate} canReplyTechnical={canReplyTechnical} onFeature={onFeatureQuestion} onReport={onReport} t={t} currentUser={currentUser} onReply={() => setShowReplyModal({id: q.id, title: q.title})} />
+            ))
           )}
         </div>
       </div>
 
-      {/* Leaderboard Sidebar */}
       <div className="lg:col-span-1">
         <div className="glass p-10 rounded-[3.5rem] border-white/5 sticky top-8 shadow-2xl">
           <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-cyan-500 mb-10 border-b border-white/5 pb-5">{t.leaderboard}</h3>
@@ -239,36 +206,6 @@ const Community: React.FC<CommunityProps> = ({ currentUser, questions, onAddQues
           </div>
         </div>
       </div>
-
-      {/* Modals for Reply/Ask */}
-      {showReplyModal && (
-        <div className="fixed inset-0 z-[400] flex items-center justify-center p-8 bg-slate-950/98 backdrop-blur-2xl">
-           <div className="glass w-full max-w-3xl p-12 rounded-[4rem] border-cyan-500/50 space-y-10 animate-in zoom-in duration-500">
-              <h2 className="text-3xl font-bold font-orbitron">{t.expertReply}</h2>
-              <textarea value={replyText} onChange={e => setReplyText(e.target.value)} placeholder="..." rows={10} className="w-full bg-slate-950 border border-white/10 rounded-[2rem] px-8 py-6 text-white text-lg focus:ring-4 ring-cyan-500/20 outline-none" />
-              <div className="flex gap-5">
-                 <button onClick={handleReplySubmit} className="flex-1 cyber-gradient py-5 rounded-[2rem] font-black text-white uppercase tracking-widest shadow-2xl">{t.submit}</button>
-                 <button onClick={() => setShowReplyModal(null)} className="px-12 py-5 rounded-[2rem] border border-white/10 font-black uppercase tracking-widest">{t.cancel}</button>
-              </div>
-           </div>
-        </div>
-      )}
-
-      {showAskModal && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-8 bg-slate-950/90 backdrop-blur-md">
-           <div className="glass w-full max-w-2xl p-12 rounded-[4rem] border-cyan-500/30 space-y-10 animate-in zoom-in duration-500">
-              <h2 className="text-3xl font-bold font-orbitron text-center">{t.newQuestion}</h2>
-              <div className="space-y-6">
-                 <input value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder={t.resourceTitle} className="w-full bg-slate-950 border border-white/10 rounded-[1.5rem] px-8 py-5 text-white" />
-                 <textarea value={newText} onChange={e => setNewText(e.target.value)} placeholder={t.resourceDesc} rows={6} className="w-full bg-slate-950 border border-white/10 rounded-[1.5rem] px-8 py-5 text-white" />
-              </div>
-              <div className="flex gap-5">
-                 <button onClick={handleAskQuestion} className="flex-1 cyber-gradient py-5 rounded-[2rem] font-black text-white uppercase tracking-widest shadow-2xl">{t.submit}</button>
-                 <button onClick={() => setShowAskModal(false)} className="px-12 py-5 rounded-[2rem] border border-white/10 font-black uppercase tracking-widest">{t.cancel}</button>
-              </div>
-           </div>
-        </div>
-      )}
     </div>
   );
 };
@@ -305,38 +242,8 @@ const QuestionCard: React.FC<{ question: Question, canModerate: boolean, canRepl
           </div>
           <span className="text-xs font-black text-slate-500 uppercase tracking-widest">{question.answers.length} {t.answered}</span>
        </div>
-       
-       {question.status === 'Unanswered' ? (
-         canReplyTechnical ? (
-           <button onClick={onReply} className="cyber-gradient px-10 py-4 rounded-[1.5rem] text-white text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl">{t.submit}</button>
-         ) : (
-           <div className="px-6 py-3 rounded-xl bg-slate-900/50 border border-white/5 text-[10px] font-black text-slate-500 uppercase tracking-widest">{t.waitingModerator}</div>
-         )
-       ) : (
-          <button onClick={onReply} className="px-8 py-3 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-white/10 transition-all">{t.submit}</button>
-       )}
+       <button onClick={onReply} className="cyber-gradient px-10 py-4 rounded-[1.5rem] text-white text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl">{t.submit}</button>
     </div>
-
-    {question.answers.length > 0 && (
-      <div className="mt-10 space-y-6">
-        {question.answers.map(ans => (
-          <div key={ans.id} className="p-8 bg-white/5 rounded-[2.5rem] border border-white/5 relative overflow-hidden group">
-             {ans.authorRole !== 'Student' && (
-               <div className="absolute top-0 right-0 px-6 py-2 bg-cyan-500 rounded-bl-3xl text-[10px] font-black text-white uppercase tracking-[0.3em] shadow-xl">Faculty Validated</div>
-             )}
-             <div className="flex items-center space-x-4 space-x-reverse mb-5">
-                <img src={`https://i.pravatar.cc/150?u=${ans.authorId}`} className="w-10 h-10 rounded-xl object-cover border border-white/10" />
-                <div className="text-start">
-                  <span className="text-base font-black text-cyan-400 uppercase tracking-tight block">{ans.authorName}</span>
-                  <span className="text-[10px] text-slate-600 font-black uppercase tracking-widest">{ans.authorRole === 'Faculty' ? t.faculty : ans.authorRole} • Verified Contributor</span>
-                </div>
-                {ans.isVerified && <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500"><Icons.Check className="w-4 h-4" /></div>}
-             </div>
-             <p className="text-base text-slate-300 leading-relaxed font-medium pl-2 text-start">{ans.text}</p>
-          </div>
-        ))}
-      </div>
-    )}
   </div>
 );
 
