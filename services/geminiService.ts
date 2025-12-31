@@ -5,8 +5,9 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export async function getAcademicAssistantResponse(prompt: string, history: {role: string, parts: {text: string}[]}[] = []) {
   try {
+    // Fix: Using 'gemini-3-pro-preview' for complex text tasks involving engineering and code auditing
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3-pro-preview',
       contents: [
         ...history,
         { role: 'user', parts: [{ text: prompt }] }
@@ -44,8 +45,9 @@ export async function getAcademicAssistantResponse(prompt: string, history: {rol
 
 export async function recommendLearningPath(description: string) {
   try {
+    // Fix: Using 'gemini-3-pro-preview' for complex reasoning required for academic roadmaps
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3-pro-preview',
       contents: [{ role: 'user', parts: [{ text: `Generate a custom engineering roadmap for: ${description}` }] }],
       config: {
         systemInstruction: "You are an Academic Advisor. Return a structured JSON roadmap for an engineering student.",

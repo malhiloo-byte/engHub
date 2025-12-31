@@ -8,13 +8,11 @@ interface SidebarProps {
   setActiveTab: (tab: string) => void;
   theme: 'light' | 'dark';
   setTheme: (t: 'light' | 'dark') => void;
-  lang: 'en' | 'ar';
-  toggleLang: () => void;
   t: any;
   userRole?: UserRole;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, theme, setTheme, lang, toggleLang, t, userRole }) => {
+const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, theme, setTheme, t, userRole }) => {
   const navItems = [
     { id: 'home', icon: <Icons.Home />, label: t.home },
     { id: 'community', icon: <Icons.Community />, label: t.community },
@@ -30,7 +28,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, theme, setTh
   }
 
   return (
-    <div className={`fixed ${lang === 'ar' ? 'right-0' : 'left-0'} top-0 h-full w-20 flex flex-col items-center py-8 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-r border-slate-200 dark:border-white/5 z-50 transition-colors duration-300`}>
+    <div className="fixed left-0 top-0 h-full w-20 flex flex-col items-center py-8 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-r border-slate-200 dark:border-white/5 z-50 transition-colors duration-300">
       <div className="mb-12 group cursor-pointer relative" onClick={() => setActiveTab('home')}>
         <div className="w-12 h-12 cyber-gradient rounded-2xl flex items-center justify-center shadow-lg shadow-cyan-500/20 transition-all duration-500 group-hover:rotate-[360deg] group-hover:scale-110 group-hover:shadow-cyan-500/50 group-hover:rounded-[50%]">
           <span className="font-orbitron font-bold text-white text-2xl group-hover:scale-125 transition-transform">C</span>
@@ -49,7 +47,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, theme, setTh
             }`}
           >
             {item.icon}
-            <span className={`absolute ${lang === 'ar' ? 'right-full mr-4' : 'left-full ml-4'} px-2 py-1 bg-slate-900 text-[10px] font-black uppercase text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10`}>
+            <span className="absolute left-full ml-4 px-2 py-1 bg-slate-900 text-[10px] font-black uppercase text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10">
               {item.label}
             </span>
           </button>
@@ -57,10 +55,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, theme, setTh
       </nav>
 
       <div className="mt-auto flex flex-col items-center space-y-4">
-        <button onClick={toggleLang} className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-white/5 group relative">
-          <Icons.Globe />
-          <span className={`absolute ${lang === 'ar' ? 'right-full mr-4' : 'left-full ml-4'} px-2 py-1 bg-slate-900 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10`}>{t.langToggle}</span>
-        </button>
         <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-white/5">
           {theme === 'dark' ? <Icons.Sun /> : <Icons.Moon />}
         </button>

@@ -30,7 +30,6 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [lang, setLang] = useState<'en' | 'ar'>('en');
   const [toasts, setToasts] = useState<Toast[]>([]);
   
   const [projects, setProjects] = useState<ProjectIdea[]>(MOCK_PROJECTS);
@@ -41,13 +40,13 @@ const App: React.FC = () => {
   
   const [viewingUser, setViewingUser] = useState<User | null>(null);
   
-  const t = TRANSLATIONS[lang];
+  const t = TRANSLATIONS.en;
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-    document.documentElement.lang = lang;
-  }, [theme, lang]);
+    document.documentElement.dir = 'ltr';
+    document.documentElement.lang = 'en';
+  }, [theme]);
 
   useEffect(() => {
     localStorage.setItem('cyberhub_users', JSON.stringify(allUsers));
@@ -64,18 +63,18 @@ const App: React.FC = () => {
     const finalUser = dbUser || user;
     setCurrentUser(finalUser);
     setIsLoggedIn(true);
-    addToast(lang === 'ar' ? `مرحباً بك مجدداً، ${finalUser.name}` : `Welcome back, ${finalUser.name}`, 'success');
+    addToast(`Welcome back, ${finalUser.name}`, 'success');
   };
 
   const handleRegister = (user: User) => {
     setAllUsers(prev => [...prev, user]);
-    addToast(lang === 'ar' ? 'تم إنشاء الحساب بنجاح' : 'Account created successfully', 'success');
+    addToast('Account created successfully', 'success');
   };
 
   const handleUpdateRole = (userId: string, newRole: UserRole) => {
     const updatedUsers = allUsers.map(u => u.id === userId ? { ...u, role: newRole } : u);
     setAllUsers(updatedUsers);
-    addToast(lang === 'ar' ? 'تم تحديث صلاحيات المستخدم' : 'User permissions updated', 'info');
+    addToast('User permissions updated', 'info');
     if (viewingUser?.id === userId) setViewingUser(prev => prev ? { ...prev, role: newRole } : null);
   };
 
@@ -84,7 +83,7 @@ const App: React.FC = () => {
     setCurrentUser(null);
     setViewingUser(null);
     setActiveTab('home');
-    addToast(lang === 'ar' ? 'تم تسجيل الخروج بأمان' : 'Log out successful');
+    addToast('Log out successful');
   };
 
   const handleUpdateRoadmap = (stepId: string) => {
@@ -112,17 +111,17 @@ const App: React.FC = () => {
     setCurrentUser(updated);
     setAllUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, filledSlots: p.filledSlots + (isJoined ? -1 : 1) } : p));
-    addToast(isJoined ? (lang === 'ar' ? 'غادرت المشروع' : 'Left Project') : (lang === 'ar' ? 'انضممت للمشروع' : 'Joined Team!'), 'info');
+    addToast(isJoined ? 'Left Project' : 'Joined Team!', 'info');
   };
 
   const handleAddQuestion = (q: Question) => {
     setQuestions(prev => [q, ...prev]);
-    addToast(lang === 'ar' ? 'تم نشر موضوعك' : 'Topic Published', 'success');
+    addToast('Topic Published', 'success');
   };
 
   const handleFeatureQuestion = (qId: string) => {
     setQuestions(prev => prev.map(q => q.id === qId ? { ...q, isFeatured: !q.isFeatured } : q));
-    addToast(lang === 'ar' ? 'تم تحديث حالة التمييز' : 'Featured status updated', 'info');
+    addToast('Featured status updated', 'info');
   };
 
   const handleReplyQuestion = (qId: string, text: string) => {
@@ -135,7 +134,7 @@ const App: React.FC = () => {
         text, timestamp: new Date(), isVerified: currentUser.role !== 'Student', upvotes: 0
       }]
     } : q));
-    addToast(lang === 'ar' ? 'تمت إضافة ردك' : 'Reply added', 'success');
+    addToast('Reply added', 'success');
   };
 
   const handleJoinMeetingRequest = () => {
@@ -144,7 +143,7 @@ const App: React.FC = () => {
       ...prev,
       joinRequests: [...prev.joinRequests.filter(r => r.userId !== currentUser.id), { userId: currentUser.id, userName: currentUser.name, status: 'Pending' }]
     }));
-    addToast(lang === 'ar' ? 'طلب الانضمام قيد المراجعة' : 'Join request pending approval', 'info');
+    addToast('Join request pending approval', 'info');
   };
 
   const handleMeetingPermission = (userId: string, action: 'Accept' | 'Reject') => {
@@ -195,38 +194,36 @@ const App: React.FC = () => {
   if (!isLoggedIn || !currentUser) {
     return (
       <>
-        <Auth onLogin={handleLogin} existingUsers={allUsers} onRegister={handleRegister} lang={lang} />
+        <Auth onLogin={handleLogin} existingUsers={allUsers} onRegister={handleRegister} />
         <ToastContainer toasts={toasts} />
       </>
     );
   }
 
   return (
-    <div className={`min-h-screen ${lang === 'ar' ? 'pr-20' : 'pl-20'} bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300`} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen pl-20 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300" dir="ltr">
       <Sidebar 
         activeTab={activeTab} 
         setActiveTab={(tab) => { setActiveTab(tab); setViewingUser(null); }} 
         theme={theme} 
         setTheme={setTheme} 
-        lang={lang}
-        toggleLang={() => setLang(lang === 'ar' ? 'en' : 'ar')}
         t={t} 
         userRole={currentUser.role}
       />
 
       <main className="max-w-7xl mx-auto px-8 py-10">
         <header className="flex justify-between items-center mb-12">
-          <div className="flex items-center space-x-4 space-x-reverse">
+          <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-orbitron font-bold cyber-text-gradient cursor-pointer" onClick={() => setActiveTab('home')}>{t.title}</h1>
             <span className="h-6 w-[1px] bg-slate-200 dark:bg-white/10" />
             <p className="text-slate-500 text-sm font-medium">{t.academicExcellence}</p>
           </div>
-          <div onClick={() => { setViewingUser(null); setActiveTab('profile'); }} className="flex items-center space-x-3 space-x-reverse bg-white dark:bg-white/5 p-1.5 pr-5 pl-1.5 rounded-full border border-slate-200 dark:border-white/5 cursor-pointer hover:border-cyan-500/50 transition-all">
-            <img src={currentUser.avatar} className="w-10 h-10 rounded-full border border-white/10 object-cover" />
-            <div className="flex flex-col">
+          <div onClick={() => { setViewingUser(null); setActiveTab('profile'); }} className="flex items-center space-x-3 bg-white dark:bg-white/5 p-1.5 pl-5 pr-1.5 rounded-full border border-slate-200 dark:border-white/5 cursor-pointer hover:border-cyan-500/50 transition-all">
+            <div className="flex flex-col text-right">
               <span className="text-xs font-bold">{currentUser.name}</span>
-              <span className="text-[9px] font-bold text-cyan-500 uppercase">{currentUser.role === 'Faculty' ? t.faculty : currentUser.role}</span>
+              <span className="text-[9px] font-bold text-cyan-500 uppercase">{currentUser.role}</span>
             </div>
+            <img src={currentUser.avatar} className="w-10 h-10 rounded-full border border-white/10 object-cover" />
           </div>
         </header>
 
@@ -281,7 +278,7 @@ const App: React.FC = () => {
             currentUser={currentUser} 
             questions={questions} 
             onAddQuestion={handleAddQuestion} 
-            onReport={(rep) => { setReports(prev => [{...rep, id: Date.now().toString(), timestamp: new Date(), status: 'Pending'}, ...prev]); addToast(lang === 'ar' ? 'تم إرسال البلاغ للمراجعة' : 'Report submitted for audit', 'info'); }} 
+            onReport={(rep) => { setReports(prev => [{...rep, id: Date.now().toString(), timestamp: new Date(), status: 'Pending'}, ...prev]); addToast('Report submitted for audit', 'info'); }} 
             onViewUser={onViewUser} 
             onFeatureQuestion={handleFeatureQuestion} 
             onReplyQuestion={handleReplyQuestion} 
@@ -313,7 +310,7 @@ const App: React.FC = () => {
           />
         )}
 
-        {activeTab === 'ai' && <ChatAssistant t={t} currentUser={currentUser} onReport={(rep) => { setReports(prev => [{...rep, id: Date.now().toString(), timestamp: new Date(), status: 'Pending'}, ...prev]); addToast(lang === 'ar' ? 'تم إرسال البلاغ للمراجعة' : 'Report submitted for audit', 'info'); }} />}
+        {activeTab === 'ai' && <ChatAssistant t={t} currentUser={currentUser} onReport={(rep) => { setReports(prev => [{...rep, id: Date.now().toString(), timestamp: new Date(), status: 'Pending'}, ...prev]); addToast('Report submitted for audit', 'info'); }} />}
 
         {activeTab === 'pathfinder' && <Pathfinder t={t} />}
 
@@ -343,8 +340,7 @@ const App: React.FC = () => {
         )}
       </main>
 
-      {/* Persistent UI elements */}
-      <div className={`fixed bottom-10 ${lang === 'ar' ? 'left-10' : 'right-10'} flex flex-col items-end space-y-4 z-50`}>
+      <div className="fixed bottom-10 right-10 flex flex-col items-end space-y-4 z-50">
         <button onClick={handleLogout} className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-lg">
            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
         </button>
@@ -354,8 +350,8 @@ const App: React.FC = () => {
       </div>
 
       {isChatOpen && (
-        <div className={`fixed bottom-32 ${lang === 'ar' ? 'left-10' : 'right-10'} w-[24rem] z-[60] animate-in slide-in-from-bottom-10 duration-300`}>
-           <ChatAssistant t={t} currentUser={currentUser} onReport={(rep) => { setReports(prev => [{...rep, id: Date.now().toString(), timestamp: new Date(), status: 'Pending'}, ...prev]); addToast(lang === 'ar' ? 'تم إرسال البلاغ للمراجعة' : 'Report submitted for audit', 'info'); }} />
+        <div className="fixed bottom-32 right-10 w-[24rem] z-[60] animate-in slide-in-from-bottom-10 duration-300">
+           <ChatAssistant t={t} currentUser={currentUser} onReport={(rep) => { setReports(prev => [{...rep, id: Date.now().toString(), timestamp: new Date(), status: 'Pending'}, ...prev]); addToast('Report submitted for audit', 'info'); }} />
         </div>
       )}
 

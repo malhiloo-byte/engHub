@@ -57,7 +57,7 @@ const Profile: React.FC<ProfileProps> = ({ user, currentUser, allUsers, handleUp
             <img src={user.avatar} className="w-40 h-40 rounded-[2.5rem] object-cover border-4 border-slate-900 shadow-2xl transition-all group-hover:scale-105" />
             {isSelf && (
               <button onClick={() => setShowEditModal(true)} className="absolute inset-0 bg-black/50 rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                <Icons.Check className="w-10 h-10 text-white" />
+                <Icons.Robot className="w-10 h-10 text-white" />
               </button>
             )}
           </div>
@@ -203,20 +203,24 @@ const Profile: React.FC<ProfileProps> = ({ user, currentUser, allUsers, handleUp
       {showEditModal && (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-8 bg-slate-950/95 backdrop-blur-xl">
            <div className="glass w-full max-w-xl p-12 rounded-[3.5rem] border-cyan-500/50 shadow-2xl space-y-10 animate-in zoom-in duration-500">
-              <h2 className="text-3xl font-bold font-orbitron text-center uppercase">Update Credentials</h2>
+              <h2 className="text-3xl font-bold font-orbitron text-center uppercase tracking-widest">Update Profile</h2>
               <div className="space-y-6">
                 <div className="space-y-3">
-                  <label className="text-[11px] font-black uppercase text-slate-500 tracking-[0.2em] ml-2">Name</label>
-                  <input value={editName} onChange={e => setEditName(e.target.value)} className="w-full bg-slate-900 border border-white/10 rounded-[1.5rem] px-6 py-4 text-white" />
+                  <label className="text-[11px] font-black uppercase text-slate-500 tracking-[0.2em] ml-2">Display Name</label>
+                  <input value={editName} onChange={e => setEditName(e.target.value)} className="w-full bg-slate-900 border border-white/10 rounded-[1.5rem] px-6 py-4 text-white outline-none focus:ring-2 ring-cyan-500/30" />
                 </div>
                 <div className="space-y-3">
                   <label className="text-[11px] font-black uppercase text-slate-500 tracking-[0.2em] ml-2">Specialization</label>
-                  <input value={editMajor} onChange={e => setEditMajor(e.target.value)} className="w-full bg-slate-900 border border-white/10 rounded-[1.5rem] px-6 py-4 text-white" />
+                  <input value={editMajor} onChange={e => setEditMajor(e.target.value)} className="w-full bg-slate-900 border border-white/10 rounded-[1.5rem] px-6 py-4 text-white outline-none focus:ring-2 ring-cyan-500/30" />
+                </div>
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black uppercase text-slate-500 tracking-[0.2em] ml-2">Avatar URL</label>
+                  <input value={editAvatar} onChange={e => setEditAvatar(e.target.value)} className="w-full bg-slate-900 border border-white/10 rounded-[1.5rem] px-6 py-4 text-white outline-none focus:ring-2 ring-cyan-500/30" placeholder="https://..." />
                 </div>
               </div>
               <div className="flex gap-4 pt-6">
-                <button onClick={handleSaveEdit} className="flex-1 cyber-gradient py-4 rounded-[1.5rem] font-black text-white uppercase tracking-widest shadow-2xl">Sync Data</button>
-                <button onClick={() => setShowEditModal(false)} className="px-10 py-4 rounded-[1.5rem] border border-white/10 font-black uppercase tracking-widest">Cancel</button>
+                <button onClick={handleSaveEdit} className="flex-1 cyber-gradient py-4 rounded-[1.5rem] font-black text-white uppercase tracking-widest shadow-2xl hover:scale-105 active:scale-95 transition-all">Sync Data</button>
+                <button onClick={() => setShowEditModal(false)} className="px-10 py-4 rounded-[1.5rem] border border-white/10 font-black uppercase tracking-widest hover:bg-white/5">Cancel</button>
               </div>
            </div>
         </div>
